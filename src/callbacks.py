@@ -3,7 +3,7 @@ import numpy as np
 from dash import Input, Output, State, callback_context, no_update
 from dash.exceptions import PreventUpdate
 import plotly.graph_objs as go
-from sim import EconomyNetwork
+from src.sim import EconomyNetwork
 
 def register_callbacks(app):
 
