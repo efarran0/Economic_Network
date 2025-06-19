@@ -5,4 +5,4 @@ services:
     plan: free
     branch: main
     buildCommand: ""
-    startCommand: gunicorn src.app:app
+    startCommand: gunicorn app:app --chdir src
