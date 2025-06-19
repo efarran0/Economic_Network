@@ -18,18 +18,18 @@ def register_callbacks(app):
         Input('start_btn', 'n_clicks'),
         Input('stop_btn', 'n_clicks'),
         Input('interval-update', 'n_intervals'),
+        Input('s_h_input', 'value'),
+        Input('s_f_input', 'value'),
+        Input('alpha_input', 'value'),
+        Input('ro_input', 'value'),
+        Input('sens_input', 'value'),
         State('screen', 'data'),
         State('econ-store', 'data'),
-        State('s_h_input', 'value'),
-        State('s_f_input', 'value'),
-        State('alpha_input', 'value'),
-        State('ro_input', 'value'),
-        State('sens_input', 'value'),
         prevent_initial_call=True
     )
-
-
-    def control_and_update(start_clicks, stop_clicks, n_intervals, screen, econ_data, s_h, s_f, alpha, ro, sens):
+    def control_and_update(start_clicks, stop_clicks, n_intervals,
+                           s_h, s_f, alpha, ro, sens,
+                           screen, econ_data):
 
         ctx = callback_context
         if not ctx.triggered:
@@ -46,13 +46,17 @@ def register_callbacks(app):
         elif trigger_id == 'stop_btn':
             return 'setup', no_update, True, no_update, no_update, no_update, no_update
 
-        elif trigger_id == 'interval-update' and screen == 'sim':
+        elif screen == 'sim':
             if not econ_data:
                 raise PreventUpdate
 
             sys = json.loads(econ_data)
             econ = EconomyNetwork([0, 0], [0.5, 0.5], 0.05)
             econ.sys = {int(k): v for k, v in sys.items()}
+
+            # Apply updated slider values dynamically
+            econ.update_params([s_h, s_f], [alpha, ro], sens)
+
             econ.step()
 
             t = [x - max(econ.sys.keys()) for x in econ.sys.keys()]
@@ -114,13 +118,11 @@ def register_callbacks(app):
         else:
             raise PreventUpdate
 
-
     @app.callback(
         Output('setup-screen', 'style'),
         Output('sim-screen', 'style'),
         Input('screen', 'data')
     )
-
     def toggle_screens(screen):
         if screen == 'setup':
             return {'display': 'block'}, {'display': 'none'}

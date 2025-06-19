@@ -11,19 +11,24 @@ layout = html.Div([
         html.H1("Simulador ECONOMY - Configuració Inicial"),
 
         html.Label("Estalvi inicial Llars:"),
-        dcc.Input(id='s_h_input', type='number', value=100, step=1),
+        dcc.Slider(id='s_h_input', min=0, max=500, step=1, value=100,
+                   tooltip={"always_visible": True}, marks=None),
 
         html.Label("Estalvi inicial Empreses:"),
-        dcc.Input(id='s_f_input', type='number', value=100, step=1),
+        dcc.Slider(id='s_f_input', min=0, max=500, step=1, value=100,
+                   tooltip={"always_visible": True}, marks=None),
 
         html.Label("Propensió inicial α:"),
-        dcc.Input(id='alpha_input', type='number', value=0.5, min=0.01, max=0.99, step=0.01),
+        dcc.Slider(id='alpha_input', min=0.01, max=0.99, step=0.01, value=0.5,
+                   tooltip={"always_visible": True}, marks=None),
 
         html.Label("Propensió inicial ρ:"),
-        dcc.Input(id='ro_input', type='number', value=0.5, min=0.01, max=0.99, step=0.01),
+        dcc.Slider(id='ro_input', min=0.01, max=0.99, step=0.01, value=0.5,
+                   tooltip={"always_visible": True}, marks=None),
 
         html.Label("Sensibilitat de canvis:"),
-        dcc.Input(id='sens_input', type='number', value=0.05, step=0.01),
+        dcc.Slider(id='sens_input', min=0.01, max=0.2, step=0.01, value=0.05,
+                   tooltip={"always_visible": True}, marks=None),
 
         html.Br(),
         html.Button('Iniciar simulació', id='start_btn', n_clicks=0)

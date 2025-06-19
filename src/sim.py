@@ -59,3 +59,13 @@ class EconomyNetwork:
         ])
 
         return matrix
+
+    def update_params(self, savings, prop, sens):
+        t = max(self.sys.keys())
+        now = self.sys[t]
+        now["s_h"] = savings[0]
+        now["s_f"] = savings[1]
+        now["alpha"] = prop[0]
+        now["ro"] = prop[1]
+        self.sens = sens
+
