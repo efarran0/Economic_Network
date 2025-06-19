@@ -10,6 +10,8 @@ app.title = "Simulació ECONOMY"
 app.layout = layout
 register_callbacks(app)
 
+server= app.server
+
 # Executar l'aplicació
 if __name__ == '__main__':
     app.run(debug=True)
