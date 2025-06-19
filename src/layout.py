@@ -11,24 +11,19 @@ layout = html.Div([
         html.H1("Simulador ECONOMY - Configuració Inicial"),
 
         html.Label("Estalvi inicial Llars:"),
-        dcc.Slider(id='s_h_input', min=0, max=500, step=1, value=100,
-                   tooltip={"always_visible": True}, marks=None),
+        dcc.Input(id='s_h_input', type='number', value=100, step=1),
 
         html.Label("Estalvi inicial Empreses:"),
-        dcc.Slider(id='s_f_input', min=0, max=500, step=1, value=100,
-                   tooltip={"always_visible": True}, marks=None),
+        dcc.Input(id='s_f_input', type='number', value=100, step=1),
 
         html.Label("Propensió inicial α:"),
-        dcc.Slider(id='alpha_input', min=0.01, max=0.99, step=0.01, value=0.5,
-                   tooltip={"always_visible": True}, marks=None),
+        dcc.Input(id='alpha_input', type='number', value=0.5, min=0.01, max=0.99, step=0.01),
 
         html.Label("Propensió inicial ρ:"),
-        dcc.Slider(id='ro_input', min=0.01, max=0.99, step=0.01, value=0.5,
-                   tooltip={"always_visible": True}, marks=None),
+        dcc.Input(id='ro_input', type='number', value=0.5, min=0.01, max=0.99, step=0.01),
 
         html.Label("Sensibilitat de canvis:"),
-        dcc.Slider(id='sens_input', min=0.01, max=0.2, step=0.01, value=0.05,
-                   tooltip={"always_visible": True}, marks=None),
+        dcc.Input(id='sens_input', type='number', value=0.05, step=0.01),
 
         html.Br(),
         html.Button('Iniciar simulació', id='start_btn', n_clicks=0)
@@ -45,20 +40,22 @@ layout = html.Div([
             ], style={'width': '60%', 'display': 'inline-block'}),
 
             html.Div([
-                html.Label("α (now):"),
+                html.Label("α (editable):"),
                 dcc.Slider(
-                    id='alpha-output', min=0, max=1, step=0.01, value=0.5,
-                    disabled=True, marks=None,
+                    id='alpha-output', min=0.01, max=0.99, step=0.01, value=0.5,
+                    marks=None,
                     tooltip={"always_visible": True, "placement": "bottom"},
                     className='danger-gradient-slider'
                 ),
-                html.Label("ρ (now):"),
+
+                html.Label("ρ (editable):"),
                 dcc.Slider(
-                    id='ro-output', min=0, max=1, step=0.01, value=0.5,
-                    disabled=True, marks=None,
+                    id='ro-output', min=0.01, max=0.99, step=0.01, value=0.5,
+                    marks=None,
                     tooltip={"always_visible": True, "placement": "bottom"},
                     className='danger-gradient-slider'
                 ),
+
                 dcc.Graph(id='propensions-graph', style={'height': '400px'})
             ], style={
                 'width': '38%',
