@@ -1,71 +1,126 @@
-import random
+import json
 import numpy as np
+from dash import Input, Output, State, callback_context, no_update
+from dash.exceptions import PreventUpdate
+import plotly.graph_objs as go
+from src.sim import EconomyNetwork
 
-class EconomyNetwork:
-    def __init__(self, savings, prop, sens):
-        self.sens = sens
-        self.sys = {
-            0: {
-                "alpha": prop[0],
-                "ro": prop[1],
-                "c": 0,
-                "w": 0,
-                "s_h": savings[0],
-                "s_f": savings[1]
-            }
-        }
+def register_callbacks(app):
+    @app.callback(
+        Output('screen', 'data'),
+        Output('econ-store', 'data'),
+        Output('interval-update', 'disabled'),
+        Output('matrix-graph', 'figure'),
+        Output('propensions-graph', 'figure'),
+        Output('alpha-output', 'value'),
+        Output('ro-output', 'value'),
+        Input('start_btn', 'n_clicks'),
+        Input('stop_btn', 'n_clicks'),
+        Input('interval-update', 'n_intervals'),
+        State('screen', 'data'),
+        State('econ-store', 'data'),
+        State('s_h_input', 'value'),
+        State('s_f_input', 'value'),
+        State('alpha_input', 'value'),
+        State('ro_input', 'value'),
+        State('sens_input', 'value'),
+        State('alpha-output', 'value'),
+        State('ro-output', 'value'),
+        prevent_initial_call=True
+    )
+    def control_and_update(start_clicks, stop_clicks, n_intervals, screen, econ_data, s_h, s_f, alpha, ro, sens, alpha_slider, ro_slider):
+        ctx = callback_context
+        if not ctx.triggered:
+            raise PreventUpdate
 
-    def step(self, alpha_override=None, ro_override=None):
-        t = max(self.sys.keys())
-        prev = self.sys[t]
+        trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-        alpha = (
-            alpha_override
-            if alpha_override is not None
-            else max(0.01, min(0.99, prev["alpha"] + random.uniform(-self.sens, self.sens)))
-        )
+        if trigger_id == 'start_btn':
+            econ = EconomyNetwork([s_h, s_f], [alpha, ro], sens)
+            data = json.dumps(econ.sys)
+            empty_fig = go.Figure()
+            return 'sim', data, False, empty_fig, empty_fig, alpha, ro
 
-        ro = (
-            ro_override
-            if ro_override is not None
-            else max(0.01, min(0.99, prev["ro"] + random.uniform(-self.sens, self.sens)))
-        )
+        elif trigger_id == 'stop_btn':
+            return 'setup', no_update, True, no_update, no_update, no_update, no_update
 
-        try:
-            c = (1 / alpha - ro) ** (-1) * (ro * prev["s_f"] + prev["s_h"])
-            w = (1 / ro - alpha) ** (-1) * (alpha * prev["s_h"] + prev["s_f"])
-        except ZeroDivisionError:
-            # Evitar error numèric en cas d'inestabilitat extrema
-            c = prev["c"]
-            w = prev["w"]
+        elif trigger_id == 'interval-update' and screen == 'sim':
+            if not econ_data:
+                raise PreventUpdate
 
-        s_h = prev["s_h"] + w - c
-        s_f = prev["s_f"] + c - w
+            sys = json.loads(econ_data)
+            econ = EconomyNetwork([0, 0], [0.5, 0.5], sens)
+            econ.sys = {int(k): v for k, v in sys.items()}
+            econ.step(alpha_override=alpha_slider, ro_override=ro_slider)
 
-        self.sys[t + 1] = {
-            "alpha": alpha,
-            "ro": ro,
-            "c": c,
-            "w": w,
-            "s_h": s_h,
-            "s_f": s_f
-        }
+            t = [x - max(econ.sys.keys()) for x in econ.sys.keys()]
+            alpha_vals = [v['alpha'] for v in econ.sys.values()]
+            ro_vals = [v['ro'] for v in econ.sys.values()]
 
-    def get_matrix(self):
-        t = max(self.sys.keys())
-        now = self.sys[t]
-        agg = now["c"] + now["w"] + now["s_h"] + now["s_f"]
+            t = t[-5:]
+            alpha_vals = [round(x, 2) for x in alpha_vals][-5:]
+            ro_vals = [round(x, 2) for x in ro_vals][-5:]
 
-        if agg == 0:
-            # Evitar divisió per zero si tot és 0 (molt improbable)
-            return np.zeros((2, 2))
+            matrix = econ.get_matrix()
+            labels = np.array([
+                ['s_h', 'c'],
+                ['w', 's_f']
+            ])
 
-        c_nrm = now["c"] / agg
-        w_nrm = now["w"] / agg
-        s_h_nrm = now["s_h"] / agg
-        s_f_nrm = now["s_f"] / agg
+            fig1 = go.Figure(data=go.Heatmap(
+                z=matrix,
+                x=['houses', 'firms'],
+                y=['houses', 'firms'],
+                colorscale=[
+                    [0.0, "#d4a373"],
+                    [0.5, "#e6b566"],
+                    [1.0, "#fbeec1"]
+                ],
+                text=labels,
+                texttemplate="%{text}",
+                textfont={"size": 16, "color": "red"},
+                zmin=0,
+                zmax=1
+            ))
+            fig1.update_layout(
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)'
+            )
+            fig1.update_yaxes(autorange="reversed")
 
-        return np.array([
-            [s_h_nrm, c_nrm],
-            [w_nrm, s_f_nrm]
-        ])
+            fig2 = go.Figure([
+                go.Scatter(x=t, y=alpha_vals, name='α', mode='lines'),
+                go.Scatter(x=t, y=ro_vals, name='ρ', mode='lines')
+            ])
+            fig2.update_layout(
+                title='Propensions α i ρ',
+                xaxis_title='t',
+                yaxis_title='Valor',
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                xaxis=dict(
+                    dtick=1,
+                    tickmode='array',
+                    tickvals=t,
+                    ticktext=[v if v != 0 else "now" for v in t]
+                ),
+                yaxis=dict(range=[0, 1])
+            )
+
+            return screen, json.dumps(econ.sys), False, fig1, fig2, alpha_vals[-1], ro_vals[-1]
+
+        else:
+            raise PreventUpdate
+
+    @app.callback(
+        Output('setup-screen', 'style'),
+        Output('sim-screen', 'style'),
+        Input('screen', 'data')
+    )
+    def toggle_screens(screen):
+        if screen == 'setup':
+            return {'display': 'block'}, {'display': 'none'}
+        elif screen == 'sim':
+            return {'display': 'none'}, {'display': 'block'}
+        else:
+            return no_update, no_update
