@@ -6,6 +6,7 @@ import plotly.graph_objs as go
 from src.sim import EconomyNetwork
 
 def register_callbacks(app):
+
     @app.callback(
         Output('screen', 'data'),
         Output('econ-store', 'data'),
@@ -17,6 +18,8 @@ def register_callbacks(app):
         Input('start_btn', 'n_clicks'),
         Input('stop_btn', 'n_clicks'),
         Input('interval-update', 'n_intervals'),
+        Input('alpha-output', 'value'),
+        Input('ro-output', 'value'),
         State('screen', 'data'),
         State('econ-store', 'data'),
         State('s_h_input', 'value'),
@@ -28,7 +31,10 @@ def register_callbacks(app):
         State('ro-output', 'value'),
         prevent_initial_call=True
     )
-    def control_and_update(start_clicks, stop_clicks, n_intervals, screen, econ_data, s_h, s_f, alpha, ro, sens, alpha_slider, ro_slider):
+    def control_and_update(start_clicks, stop_clicks, n_intervals, alpha_input, ro_input,
+                            screen, econ_data, s_h, s_f, alpha_init, ro_init, sens,
+                            alpha_state, ro_state):
+
         ctx = callback_context
         if not ctx.triggered:
             raise PreventUpdate
@@ -36,10 +42,10 @@ def register_callbacks(app):
         trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
         if trigger_id == 'start_btn':
-            econ = EconomyNetwork([s_h, s_f], [alpha, ro], sens)
+            econ = EconomyNetwork([s_h, s_f], [alpha_init, ro_init], sens)
             data = json.dumps(econ.sys)
             empty_fig = go.Figure()
-            return 'sim', data, False, empty_fig, empty_fig, alpha, ro
+            return 'sim', data, False, empty_fig, empty_fig, alpha_init, ro_init
 
         elif trigger_id == 'stop_btn':
             return 'setup', no_update, True, no_update, no_update, no_update, no_update
@@ -51,7 +57,15 @@ def register_callbacks(app):
             sys = json.loads(econ_data)
             econ = EconomyNetwork([0, 0], [0.5, 0.5], sens)
             econ.sys = {int(k): v for k, v in sys.items()}
-            econ.step(alpha_override=alpha_slider, ro_override=ro_slider)
+
+            # Verifiquem si l'usuari ha modificat el slider
+            use_manual_alpha = alpha_input != alpha_state
+            use_manual_ro = ro_input != ro_state
+
+            econ.step(
+                alpha_override=alpha_input if use_manual_alpha else None,
+                ro_override=ro_input if use_manual_ro else None
+            )
 
             t = [x - max(econ.sys.keys()) for x in econ.sys.keys()]
             alpha_vals = [v['alpha'] for v in econ.sys.values()]
@@ -111,6 +125,7 @@ def register_callbacks(app):
 
         else:
             raise PreventUpdate
+
 
     @app.callback(
         Output('setup-screen', 'style'),
