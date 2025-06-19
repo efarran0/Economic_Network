@@ -13,5 +13,3 @@ register_callbacks(app)
 # Executar l'aplicació
 if __name__ == '__main__':
     app.run(debug=True)
-
-print("APP LOADED ✔️")
