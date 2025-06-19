@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: economic-simulator
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn src.app:app
