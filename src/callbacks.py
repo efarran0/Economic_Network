@@ -5,8 +5,8 @@ from dash.exceptions import PreventUpdate
 import plotly.graph_objs as go
 from src.sim import EconomyNetwork
 
-def register_callbacks(app):
 
+def register_callbacks(app):
     @app.callback(
         Output('screen', 'data'),
         Output('econ-store', 'data'),
@@ -27,13 +27,10 @@ def register_callbacks(app):
         State('alpha_input', 'value'),
         State('ro_input', 'value'),
         State('sens_input', 'value'),
-        State('alpha-output', 'value'),
-        State('ro-output', 'value'),
         prevent_initial_call=True
     )
-    def control_and_update(start_clicks, stop_clicks, n_intervals, alpha_input, ro_input,
-                            screen, econ_data, s_h, s_f, alpha_init, ro_init, sens,
-                            alpha_state, ro_state):
+    def control_and_update(start_clicks, stop_clicks, n_intervals, alpha_slider, ro_slider,
+                           screen, econ_data, s_h, s_f, alpha_input, ro_input, sens):
 
         ctx = callback_context
         if not ctx.triggered:
@@ -42,15 +39,15 @@ def register_callbacks(app):
         trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
         if trigger_id == 'start_btn':
-            econ = EconomyNetwork([s_h, s_f], [alpha_init, ro_init], sens)
+            econ = EconomyNetwork([s_h, s_f], [alpha_input, ro_input], sens)
             data = json.dumps(econ.sys)
             empty_fig = go.Figure()
-            return 'sim', data, False, empty_fig, empty_fig, alpha_init, ro_init
+            return 'sim', data, False, empty_fig, empty_fig, alpha_input, ro_input
 
         elif trigger_id == 'stop_btn':
             return 'setup', no_update, True, no_update, no_update, no_update, no_update
 
-        elif trigger_id == 'interval-update' and screen == 'sim':
+        elif trigger_id in ['interval-update', 'alpha-output', 'ro-output'] and screen == 'sim':
             if not econ_data:
                 raise PreventUpdate
 
@@ -58,53 +55,48 @@ def register_callbacks(app):
             econ = EconomyNetwork([0, 0], [0.5, 0.5], sens)
             econ.sys = {int(k): v for k, v in sys.items()}
 
-            # Verifiquem si l'usuari ha modificat el slider
-            use_manual_alpha = alpha_input != alpha_state
-            use_manual_ro = ro_input != ro_state
+            # Determinar overrides des dels sliders
+            alpha_override = alpha_slider if trigger_id == 'alpha-output' else None
+            ro_override = ro_slider if trigger_id == 'ro-output' else None
 
-            econ.step(
-                alpha_override=alpha_input if use_manual_alpha else None,
-                ro_override=ro_input if use_manual_ro else None
-            )
+            # Aplicar valors als últims estats si l'usuari ha modificat sliders
+            t = max(econ.sys.keys())
+            if alpha_override is not None:
+                econ.sys[t]['alpha'] = alpha_override
+            if ro_override is not None:
+                econ.sys[t]['ro'] = ro_override
 
-            t = [x - max(econ.sys.keys()) for x in econ.sys.keys()]
-            alpha_vals = [v['alpha'] for v in econ.sys.values()]
-            ro_vals = [v['ro'] for v in econ.sys.values()]
+            # Executar següent pas
+            econ.step(alpha_override=alpha_override, ro_override=ro_override)
 
-            t = t[-5:]
-            alpha_vals = [round(x, 2) for x in alpha_vals][-5:]
-            ro_vals = [round(x, 2) for x in ro_vals][-5:]
+            # Preparar dades per les gràfiques
+            t_vals = [x - max(econ.sys.keys()) for x in econ.sys.keys()]
+            alpha_vals = [round(v['alpha'], 2) for v in econ.sys.values()]
+            ro_vals = [round(v['ro'], 2) for v in econ.sys.values()]
+
+            t_plot = t_vals[-5:]
+            alpha_plot = alpha_vals[-5:]
+            ro_plot = ro_vals[-5:]
 
             matrix = econ.get_matrix()
-            labels = np.array([
-                ['s_h', 'c'],
-                ['w', 's_f']
-            ])
-
+            labels = np.array([['s_h', 'c'], ['w', 's_f']])
             fig1 = go.Figure(data=go.Heatmap(
                 z=matrix,
                 x=['houses', 'firms'],
                 y=['houses', 'firms'],
-                colorscale=[
-                    [0.0, "#d4a373"],
-                    [0.5, "#e6b566"],
-                    [1.0, "#fbeec1"]
-                ],
+                colorscale=[[0.0, "#d4a373"], [0.5, "#e6b566"], [1.0, "#fbeec1"]],
                 text=labels,
                 texttemplate="%{text}",
                 textfont={"size": 16, "color": "red"},
                 zmin=0,
                 zmax=1
             ))
-            fig1.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)'
-            )
+            fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
             fig1.update_yaxes(autorange="reversed")
 
             fig2 = go.Figure([
-                go.Scatter(x=t, y=alpha_vals, name='α', mode='lines'),
-                go.Scatter(x=t, y=ro_vals, name='ρ', mode='lines')
+                go.Scatter(x=t_plot, y=alpha_plot, name='α', mode='lines'),
+                go.Scatter(x=t_plot, y=ro_plot, name='ρ', mode='lines')
             ])
             fig2.update_layout(
                 title='Propensions α i ρ',
@@ -112,12 +104,8 @@ def register_callbacks(app):
                 yaxis_title='Valor',
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
-                xaxis=dict(
-                    dtick=1,
-                    tickmode='array',
-                    tickvals=t,
-                    ticktext=[v if v != 0 else "now" for v in t]
-                ),
+                xaxis=dict(dtick=1, tickvals=t_plot,
+                           ticktext=[str(v) if v != 0 else "now" for v in t_plot]),
                 yaxis=dict(range=[0, 1])
             )
 
@@ -125,7 +113,6 @@ def register_callbacks(app):
 
         else:
             raise PreventUpdate
-
 
     @app.callback(
         Output('setup-screen', 'style'),
