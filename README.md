@@ -40,16 +40,17 @@ To clone and run the project locally, located in the terminal and follow this st
 **1. Clone the repository from the remote GitHub source**
 
 git clone https://github.com/efarran0/Economic_Network_Simulator.git
+
 cd Economic_Network_Simulator
 
 **2. Create and activate a virtual environment (Optional)**
 
 python -m venv venv
 
-# On Windows
+On Windows:
 venv\Scripts\activate
 
-# On Linux/macOS
+On Linux/macOS:
 source venv/bin/activate
 
 **3. Install required dependencies from the requirements file**
