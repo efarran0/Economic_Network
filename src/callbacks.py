@@ -14,23 +14,23 @@ def register_callbacks(app):
         Output('matrix-graph', 'figure'),
         Output('propensions-graph', 'figure'),
         Output('alpha-output', 'value'),
-        Output('ro-output', 'value'),
+        Output('rho-output', 'value'),
         Input('start_btn', 'n_clicks'),
         Input('stop_btn', 'n_clicks'),
         Input('interval-update', 'n_intervals'),
         Input('alpha-output', 'value'),
-        Input('ro-output', 'value'),
+        Input('rho-output', 'value'),
         State('screen', 'data'),
         State('econ-store', 'data'),
         State('s_h_input', 'value'),
         State('s_f_input', 'value'),
         State('alpha_input', 'value'),
-        State('ro_input', 'value'),
+        State('rho_input', 'value'),
         State('sens_input', 'value'),
         prevent_initial_call=True
     )
-    def control_and_update(start_clicks, stop_clicks, n_intervals, alpha_slider, ro_slider,
-                           screen, econ_data, s_h, s_f, alpha_input, ro_input, sens):
+    def control_and_update(start_clicks, stop_clicks, n_intervals, alpha_slider, rho_slider,
+                           screen, econ_data, s_h, s_f, alpha_input, rho_input, sens):
 
         ctx = callback_context
         if not ctx.triggered:
@@ -39,15 +39,15 @@ def register_callbacks(app):
         trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
         if trigger_id == 'start_btn':
-            econ = EconomyNetwork([s_h, s_f], [alpha_input, ro_input], sens)
+            econ = EconomyNetwork([s_h, s_f], [alpha_input, rho_input], sens)
             data = json.dumps(econ.sys)
             empty_fig = go.Figure()
-            return 'sim', data, False, empty_fig, empty_fig, alpha_input, ro_input
+            return 'sim', data, False, empty_fig, empty_fig, alpha_input, rho_input
 
         elif trigger_id == 'stop_btn':
             return 'setup', no_update, True, no_update, no_update, no_update, no_update
 
-        elif trigger_id in ['interval-update', 'alpha-output', 'ro-output'] and screen == 'sim':
+        elif trigger_id in ['interval-update', 'alpha-output', 'rho-output'] and screen == 'sim':
             if not econ_data:
                 raise PreventUpdate
 
@@ -57,26 +57,26 @@ def register_callbacks(app):
 
             # Determinar overrides des dels sliders
             alpha_override = alpha_slider if trigger_id == 'alpha-output' else None
-            ro_override = ro_slider if trigger_id == 'ro-output' else None
+            rho_override = rho_slider if trigger_id == 'rho-output' else None
 
             # Aplicar valors als últims estats si l'usuari ha modificat sliders
             t = max(econ.sys.keys())
             if alpha_override is not None:
                 econ.sys[t]['alpha'] = alpha_override
-            if ro_override is not None:
-                econ.sys[t]['ro'] = ro_override
+            if rho_override is not None:
+                econ.sys[t]['rho'] = rho_override
 
             # Executar següent pas
-            econ.step(alpha_override=alpha_override, ro_override=ro_override)
+            econ.step(alpha_override=alpha_override, rho_override=rho_override)
 
             # Preparar dades per les gràfiques
             t_vals = [x - max(econ.sys.keys()) for x in econ.sys.keys()]
             alpha_vals = [round(v['alpha'], 2) for v in econ.sys.values()]
-            ro_vals = [round(v['ro'], 2) for v in econ.sys.values()]
+            rho_vals = [round(v['rho'], 2) for v in econ.sys.values()]
 
             t_plot = t_vals[-5:]
             alpha_plot = alpha_vals[-5:]
-            ro_plot = ro_vals[-5:]
+            rho_plot = rho_vals[-5:]
 
             matrix = econ.get_matrix()
             labels = np.array([['s_h', 'c'], ['w', 's_f']])
@@ -96,10 +96,10 @@ def register_callbacks(app):
 
             fig2 = go.Figure([
                 go.Scatter(x=t_plot, y=alpha_plot, name='α', mode='lines'),
-                go.Scatter(x=t_plot, y=ro_plot, name='ρ', mode='lines')
+                go.Scatter(x=t_plot, y=rho_plot, name='ρ', mode='lines')
             ])
             fig2.update_layout(
-                title='Propensions α i ρ',
+                title='Historical propensity data',
                 xaxis_title='t',
                 yaxis_title='Valor',
                 plot_bgcolor='rgba(0,0,0,0)',
