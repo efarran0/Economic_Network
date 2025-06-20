@@ -39,7 +39,7 @@ To clone and run the project locally:
 
 ```bash
 git clone https://github.com/efarran0/Economic_Network_Simulator.git
-cd Economic_Network_Simulator
+cd Economic_Network_Simulator/src
 python app.py
 ```
 
