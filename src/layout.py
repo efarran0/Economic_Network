@@ -21,12 +21,12 @@ layout = html.Div([
         ], style={'marginBottom': '15px'}),
 
         html.Div([
-            html.Label("Initial consume propensity (α):"),
+            html.Label("Initial consumption propensity (α):"),
             dcc.Input(id='alpha_input', type='number', value=0.5, min=0.01, max=0.99, step=0.01, style={'display': 'block', 'width': '100%'}),
         ], style={'marginBottom': '15px'}),
 
         html.Div([
-            html.Label("Initial pay salary propensity (ρ):"),
+            html.Label("Initial salary payment propensity (ρ):"),
             dcc.Input(id='rho_input', type='number', value=0.5, min=0.01, max=0.99, step=0.01, style={'display': 'block', 'width': '100%'}),
         ], style={'marginBottom': '15px'}),
 
