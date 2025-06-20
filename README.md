@@ -57,15 +57,11 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-**4. Navigate into the 'src' directory where the main application code resides**
-
-cd src
-
-**5. Execute the application script to launch the visualization**
+**4. Execute the application script to launch the visualization**
 
 python -m src.app
 
-**6. Click on the running link**
+**5. Click on the running link**
 
 Alternatively, you can explore the simulation directly through the [Render web application](https://economic-network-simulator.onrender.com/)
 
