@@ -38,8 +38,8 @@ AI tools were employed to support:
 To clone and run the project locally:
 
 ```bash
-git clone https://github.com/efarran0/economic_network_simulator.git
-cd economic_network_simulator
+git clone https://github.com/efarran0/Economic_Network_Simulator.git
+cd Economic_Network_Simulator
 python app.py
 ```
 
