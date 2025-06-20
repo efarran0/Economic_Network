@@ -43,8 +43,6 @@ git clone https://github.com/efarran0/Economic_Network_Simulator.git
 
 cd Economic_Network_Simulator
 
-
-
 **2. Create and activate a virtual environment (Optional)**
 
 python -m venv venv
@@ -55,25 +53,17 @@ venv\Scripts\activate
 On Linux/macOS:
 source venv/bin/activate
 
-
-
 **3. Install required dependencies from the requirements file**
 
 pip install -r requirements.txt
-
-
 
 **4. Navigate into the 'src' directory where the main application code resides**
 
 cd src
 
-
-
 **5. Execute the application script to launch the visualization**
 
 python app.py
-
-
 
 Alternatively, you can explore the simulation directly through the [Render web application](https://economic-network-simulator.onrender.com/)
 
