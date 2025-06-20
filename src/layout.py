@@ -11,12 +11,12 @@ layout = html.Div([
         html.H1("Economy simulator - Setting"),
 
         html.Div([
-            html.Label("Initial households saves:"),
+            html.Label("Initial households savings:"),
             dcc.Input(id='s_h_input', type='number', value=100, step=1, style={'display': 'block', 'width': '100%'}),
         ], style={'marginBottom': '15px'}),
 
         html.Div([
-            html.Label("Initial firms saves:"),
+            html.Label("Initial firms savings:"),
             dcc.Input(id='s_f_input', type='number', value=100, step=1, style={'display': 'block', 'width': '100%'}),
         ], style={'marginBottom': '15px'}),
 
