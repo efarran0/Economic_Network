@@ -109,7 +109,7 @@ def register_callbacks(app):
                 yaxis=dict(range=[0, 1])
             )
 
-            return screen, json.dumps(econ.sys), False, fig1, fig2, alpha_vals[-1], ro_vals[-1]
+            return screen, json.dumps(econ.sys), False, fig1, fig2, alpha_vals[-1], rho_vals[-1]
 
         else:
             raise PreventUpdate

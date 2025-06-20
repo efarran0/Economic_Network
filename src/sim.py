@@ -7,7 +7,7 @@ class EconomyNetwork:
         self.sys = {
             0: {
                 "alpha": prop[0],
-                "ro": prop[1],
+                "rho": prop[1],
                 "c": 0,
                 "w": 0,
                 "s_h": savings[0],
@@ -15,7 +15,7 @@ class EconomyNetwork:
             }
         }
 
-    def step(self, alpha_override=None, ro_override=None):
+    def step(self, alpha_override=None, rho_override=None):
         t = max(self.sys.keys())
         prev = self.sys[t]
 
@@ -25,15 +25,15 @@ class EconomyNetwork:
             else max(0.01, min(0.99, prev["alpha"] + random.uniform(-self.sens, self.sens)))
         )
 
-        ro = (
-            ro_override
-            if ro_override is not None
-            else max(0.01, min(0.99, prev["ro"] + random.uniform(-self.sens, self.sens)))
+        rho = (
+            rho_override
+            if rho_override is not None
+            else max(0.01, min(0.99, prev["rho"] + random.uniform(-self.sens, self.sens)))
         )
 
         try:
-            c = (1 / alpha - ro) ** (-1) * (ro * prev["s_f"] + prev["s_h"])
-            w = (1 / ro - alpha) ** (-1) * (alpha * prev["s_h"] + prev["s_f"])
+            c = (1 / alpha - rho) ** (-1) * (rho * prev["s_f"] + prev["s_h"])
+            w = (1 / rho - alpha) ** (-1) * (alpha * prev["s_h"] + prev["s_f"])
         except ZeroDivisionError:
             # Evitar error numèric en cas d'inestabilitat extrema
             c = prev["c"]
@@ -44,7 +44,7 @@ class EconomyNetwork:
 
         self.sys[t + 1] = {
             "alpha": alpha,
-            "ro": ro,
+            "rho": rho,
             "c": c,
             "w": w,
             "s_h": s_h,

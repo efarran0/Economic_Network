@@ -4,7 +4,7 @@ from src.callbacks import register_callbacks
 
 # Initialize Dash app
 dash_app = Dash(__name__)
-dash_app.title = "Simulació ECONOMY"
+dash_app.title = "Economy simulator"
 
 # Setup layout and callbacks
 dash_app.layout = layout
