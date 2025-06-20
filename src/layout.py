@@ -10,28 +10,37 @@ layout = html.Div([
     html.Div(id='setup-screen', children=[
         html.H1("Economy simulator - Setting"),
 
-        html.Label("Initial households saves:"),
-        dcc.Input(id='s_h_input', type='number', value=100, step=1),
+        html.Div([
+            html.Label("Initial households saves:"),
+            dcc.Input(id='s_h_input', type='number', value=100, step=1, style={'display': 'block', 'width': '100%'}),
+        ], style={'marginBottom': '15px'}),
 
-        html.Label("Initial firms saves:"),
-        dcc.Input(id='s_f_input', type='number', value=100, step=1),
+        html.Div([
+            html.Label("Initial firms saves:"),
+            dcc.Input(id='s_f_input', type='number', value=100, step=1, style={'display': 'block', 'width': '100%'}),
+        ], style={'marginBottom': '15px'}),
 
-        html.Label("Initial consume propensity (α):"),
-        dcc.Input(id='alpha_input', type='number', value=0.5, min=0.01, max=0.99, step=0.01),
+        html.Div([
+            html.Label("Initial consume propensity (α):"),
+            dcc.Input(id='alpha_input', type='number', value=0.5, min=0.01, max=0.99, step=0.01, style={'display': 'block', 'width': '100%'}),
+        ], style={'marginBottom': '15px'}),
 
-        html.Label("Initial pay salary propensity (ρ):"),
-        dcc.Input(id='rho_input', type='number', value=0.5, min=0.01, max=0.99, step=0.01),
+        html.Div([
+            html.Label("Initial pay salary propensity (ρ):"),
+            dcc.Input(id='rho_input', type='number', value=0.5, min=0.01, max=0.99, step=0.01, style={'display': 'block', 'width': '100%'}),
+        ], style={'marginBottom': '15px'}),
 
-        html.Label("Stability:"),
-        dcc.Input(id='sens_input', type='number', value=0.05, step=0.01),
+        html.Div([
+            html.Label("Stability:"),
+            dcc.Input(id='sens_input', type='number', value=0.05, step=0.01, style={'display': 'block', 'width': '100%'}),
+        ], style={'marginBottom': '20px'}),
 
-        html.Br(),
-        html.Button('Start simulation', id='start_btn', n_clicks=0)
-    ], style={'display': 'block'}),
+        html.Button('Start simulation', id='start_btn', n_clicks=0, style={'display': 'block', 'marginTop': '10px'})
+    ], style={'display': 'block', 'maxWidth': '400px', 'margin': 'auto'}),
 
     # Pantalla de simulació
     html.Div(id='sim-screen', children=[
-        html.H1("Simulació en curs"),
+        html.H1("Interactive dashboard"),
         html.Button('Stop and go back', id='stop_btn', n_clicks=0),
 
         html.Div([

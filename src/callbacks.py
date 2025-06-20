@@ -82,8 +82,8 @@ def register_callbacks(app):
             labels = np.array([['s_h', 'c'], ['w', 's_f']])
             fig1 = go.Figure(data=go.Heatmap(
                 z=matrix,
-                x=['houses', 'firms'],
-                y=['houses', 'firms'],
+                x=['households', 'firms'],
+                y=['households', 'firms'],
                 colorscale=[[0.0, "#d4a373"], [0.5, "#e6b566"], [1.0, "#fbeec1"]],
                 text=labels,
                 texttemplate="%{text}",
