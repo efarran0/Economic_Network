@@ -41,7 +41,7 @@ To clone and run the project locally, located in the terminal and follow this st
 
 git clone https://github.com/efarran0/Economic_Network_Simulator.git
 
-cd Economic_Network_Simulator
+cd Economic_Network_Simulator<br>
 
 **2. Create and activate a virtual environment (Optional)**
 
