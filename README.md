@@ -63,7 +63,9 @@ cd src
 
 **5. Execute the application script to launch the visualization**
 
-python app.py
+python -m src.app
+
+**6. Click on the running link**
 
 Alternatively, you can explore the simulation directly through the [Render web application](https://economic-network-simulator.onrender.com/)
 
