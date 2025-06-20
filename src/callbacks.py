@@ -86,7 +86,7 @@ def register_callbacks(app):
                 y=['households', 'firms'],
                 colorscale=[[0.0, "#d4a373"], [0.5, "#e6b566"], [1.0, "#fbeec1"]],
                 text=labels,
-                texttemplate="%{text}",
+                texttemplate="%{z}<extra></extra>",
                 textfont={"size": 16, "color": "red"},
                 zmin=0,
                 zmax=1
