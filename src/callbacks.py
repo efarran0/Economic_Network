@@ -102,7 +102,7 @@ def register_callbacks(app):
             fig2.update_layout(
                 title='Historical propensity data',
                 xaxis_title='t',
-                yaxis_title='Valor',
+                yaxis_title='Value',
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 xaxis=dict(dtick=1, tickvals=t_plot,

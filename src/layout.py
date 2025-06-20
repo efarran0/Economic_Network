@@ -40,7 +40,7 @@ layout = html.Div([
 
     # Pantalla de simulació
     html.Div(id='sim-screen', children=[
-        html.H1("Interactive dashboard"),
+        html.H1("Economy simulator - dashboard"),
         html.Button('Stop and go back', id='stop_btn', n_clicks=0),
 
         html.Div([
