@@ -31,8 +31,13 @@ layout = html.Div([
         ], style={'marginBottom': '15px'}),
 
         html.Div([
-            html.Label("Stability:"),
+            html.Label("Volatility:"),
             dcc.Input(id='sens_input', type='number', value=0.05, step=0.01, style={'display': 'block', 'width': '100%'}),
+        ], style={'marginBottom': '20px'}),
+
+        html.Div([
+            html.Label("Memory:"),
+            dcc.Input(id='mem_input', type='number', value=5, step=1, style={'display': 'block', 'width': '100%'}),
         ], style={'marginBottom': '20px'}),
 
         html.Button('Start simulation', id='start_btn', n_clicks=0, style={'display': 'block', 'marginTop': '10px'})
@@ -44,10 +49,17 @@ layout = html.Div([
         html.Button('Stop and go back', id='stop_btn', n_clicks=0),
 
         html.Div([
-            html.Div([
-                dcc.Graph(id='matrix-graph', style={'height': '600px'})
-            ], style={'width': '60%', 'display': 'inline-block'}),
 
+            # Gràfic de matriu econòmica
+            html.Div([
+                dcc.Graph(id='matrix-graph', style={'height': '600px', 'width': '100%'}),
+            ], style={
+                'width': '60%',
+                'display': 'inline-block',
+                'verticalAlign': 'top'
+            }),
+
+            # Controls i gràfic de propensions
             html.Div([
                 html.Label("α (editable):"),
                 dcc.Slider(
@@ -65,13 +77,15 @@ layout = html.Div([
                     className='danger-gradient-slider'
                 ),
 
-                dcc.Graph(id='propensions-graph', style={'height': '400px'})
+                # Gràfic combinat
+                dcc.Graph(id='propensions-graph', style={'height': '600px', 'width': '100%'}),
             ], style={
                 'width': '38%',
                 'display': 'inline-block',
+                'verticalAlign': 'top',
                 'paddingLeft': '2%',
-                'verticalAlign': 'top'
-            })
+            }),
+
         ])
     ], style={'display': 'none'})
 ])

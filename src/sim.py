@@ -1,19 +1,29 @@
 import random
 import numpy as np
+from src.anomaly_detection import AnomalyDetection
 
 class EconomyNetwork:
-    def __init__(self, savings, prop, sens):
+    def __init__(self, savings, prop, sens, mem_input):
         self.sens = sens
+        self.mem_input = mem_input
         self.sys = {
             0: {
                 "alpha": prop[0],
                 "rho": prop[1],
+                "outliers":
+                    {
+                    "alpha": [False],
+                    "rho": [False]
+                    },
                 "c": 0,
                 "w": 0,
                 "s_h": savings[0],
                 "s_f": savings[1]
             }
         }
+
+    def get_values(self, key):
+        return [state[key] for t, state in sorted(self.sys.items())[-self.mem_input:]]
 
     def step(self, alpha_override=None, rho_override=None):
         t = max(self.sys.keys())
@@ -35,16 +45,31 @@ class EconomyNetwork:
             c = (1 / alpha - rho) ** (-1) * (rho * prev["s_f"] + prev["s_h"])
             w = (1 / rho - alpha) ** (-1) * (alpha * prev["s_h"] + prev["s_f"])
         except ZeroDivisionError:
-            # Evitar error numèric en cas d'inestabilitat extrema
             c = prev["c"]
             w = prev["w"]
 
         s_h = prev["s_h"] + w - c
         s_f = prev["s_f"] + c - w
 
+        if len(self.sys) >= self.mem_input:
+            alpha_vals = self.get_values('alpha')
+            rho_vals = self.get_values('rho')
+            alpha_is_out = AnomalyDetection(alpha_vals).iqr(alpha)
+            rho_is_out = AnomalyDetection(rho_vals).iqr(rho)
+            outliers = {
+            'alpha': (prev['outliers']['alpha'] + [alpha_is_out])[-self.mem_input:],
+            'rho': (prev['outliers']['rho'] + [rho_is_out])[-self.mem_input:]
+            }
+        else:
+            outliers = {
+                'alpha': [False] * (len(self.sys) + 1),
+                'rho': [False] * (len(self.sys) + 1)
+            }
+
         self.sys[t + 1] = {
             "alpha": alpha,
             "rho": rho,
+            "outliers": outliers,
             "c": c,
             "w": w,
             "s_h": s_h,
@@ -57,7 +82,6 @@ class EconomyNetwork:
         N = now["c"] + now["w"] + now["s_h"] + now["s_f"]
 
         if N == 0:
-            # Evitar divisió per zero si tot és 0 (molt improbable)
             return np.zeros((2, 2))
 
         c_nrm = now["c"] / N
