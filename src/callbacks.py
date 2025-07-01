@@ -106,7 +106,7 @@ def register_callbacks(app):
                 title_text='t',
                 dtick=1,
                 tickvals=t_plot,
-                ticktext=[str(v) if v != 0 else "now" for v in t_plot],
+                ticktext=[str("") if v != 0 else "now" for v in t_plot],
                 range=[min(t_plot), max(t_plot)],
                 row=1, col=1
             )
