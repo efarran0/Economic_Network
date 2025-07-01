@@ -166,6 +166,18 @@ def register_callbacks(app):
             fig_combined['data'][2]['showlegend'] = False
             fig_combined['data'][3]['showlegend'] = False
 
+            # Activa llegenda outliers
+            fig_combined.add_trace(
+                go.Scatter(
+                    x=[None], y=[None],  # No es mostra al gràfic
+                    mode='markers',
+                    marker=dict(color='firebrick', size=12, symbol='star'),
+                    name='Outlier',
+                    showlegend=True
+                ),
+                row=1, col=1
+            )
+
             # Suposem que tens aquestes llistes booleanes amb outliers:
             alpha_outliers = econ.sys[t]['outliers']['alpha']
             rho_outliers = econ.sys[t]['outliers']['rho']
