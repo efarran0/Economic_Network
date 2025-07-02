@@ -1,6 +1,7 @@
 import random
 import numpy as np
-from src.anomaly_detection import AnomalyDetection
+from src.anomaly_detection import tsa
+
 
 class EconomyNetwork:
     def __init__(self, savings, prop, sens, mem_input):
@@ -23,7 +24,7 @@ class EconomyNetwork:
         }
 
     def get_values(self, key):
-        return [state[key] for t, state in sorted(self.sys.items())[-self.mem_input:]]
+        return [state[key] for t, state in sorted(self.sys.items())[-(self.mem_input -1):]]
 
     def step(self, alpha_override=None, rho_override=None):
         t = max(self.sys.keys())
@@ -52,10 +53,10 @@ class EconomyNetwork:
         s_f = prev["s_f"] + c - w
 
         if len(self.sys) >= self.mem_input:
-            alpha_vals = self.get_values('alpha')
-            rho_vals = self.get_values('rho')
-            alpha_is_out = AnomalyDetection(alpha_vals).iqr(alpha)
-            rho_is_out = AnomalyDetection(rho_vals).iqr(rho)
+            alpha_vals = self.get_values('alpha') + [alpha]
+            rho_vals = self.get_values('rho') + [rho]
+            alpha_is_out = tsa(alpha_vals)
+            rho_is_out = tsa(rho_vals)
             outliers = {
             'alpha': (prev['outliers']['alpha'] + [alpha_is_out])[-self.mem_input:],
             'rho': (prev['outliers']['rho'] + [rho_is_out])[-self.mem_input:]

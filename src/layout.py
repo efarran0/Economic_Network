@@ -37,7 +37,7 @@ layout = html.Div([
 
         html.Div([
             html.Label("Memory:"),
-            dcc.Input(id='mem_input', type='number', value=5, step=1, style={'display': 'block', 'width': '100%'}),
+            dcc.Input(id='mem_input', type='number', value=30, step=1, style={'display': 'block', 'width': '100%'}),
         ], style={'marginBottom': '20px'}),
 
         html.Button('Start simulation', id='start_btn', n_clicks=0, style={'display': 'block', 'marginTop': '10px'})
