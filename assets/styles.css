@@ -1,32 +1,38 @@
+/* Import the 'Inter' font from Google Fonts with weights 400 (regular) and 600 (semibold) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
+/* Base styles for the body element */
 body {
-    background-color: #f7f4ee;
-    color: #2e2e2e;
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    padding: 0;
-    font-size: 16px;
-    line-height: 1.5;
+    background-color: #f7f4ee;          /* Light beige background for a clean, soft look */
+    color: #2e2e2e;                     /* Dark gray text for good readability */
+    font-family: 'Inter', sans-serif;   /* Primary font family */
+    margin: 0;                          /* Remove default browser margin */
+    padding: 0;                         /* Remove default browser padding */
+    font-size: 16px;                    /* Base font size */
+    line-height: 1.5;                   /* Line height for better text readability */
 }
 
+/* Styles for headings (h1, h2, h3) */
 h1, h2, h3 {
-    color: #1f1f1f;
-    font-weight: 600;
-    margin-bottom: 12px;
+    color: #1f1f1f;                     /* Slightly darker text to highlight headings */
+    font-weight: 600;                   /* Semibold weight to distinguish headings from body text */
+    margin-bottom: 12px;                /* Space below headings for separation from other elements */
 }
 
+/* Styles for label elements */
 label {
-    color: #6a6a6a;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
+    color: #6a6a6a;                     /* Medium gray color to differentiate labels from main text */
+    margin-bottom: 6px;                 /* Spacing below label to separate from form fields */
+    font-size: 0.9rem;                  /* Slightly smaller than normal text for subtlety */
 }
 
+/* Styles for text and number input fields */
 input[type="text"], input[type="number"] {
-    background-color: #ffffff;
-    border: 1px solid #dcd6c9;
-    color: #2e2e2e;
-    padding: 10px 12px;
-    border-radius: 6px;
-    width: 100%;
-    fo
+    background-color: #ffffff;          /* White background for clear input areas */
+    border: 1px solid #dcd6c9;          /* Light gray border for subtle separation */
+    color: #2e2e2e;                     /* Dark gray text for input readability */
+    padding: 10px 12px;                 /* Inner spacing for comfortable typing area */
+    border-radius: 6px;                 /* Slightly rounded corners for a modern look */
+    width: 100%;                        /* Make input fields span the full width of the container */
+    font-size: 1rem;                    /* Standard font size for inputs */
+}

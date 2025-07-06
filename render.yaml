@@ -1,7 +1,7 @@
 services:
-  - type: web
-    name: economic-simulator
-    runtime: python
-    plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn src.app:app
+  - type: web                                     # This defines a web service (HTTP server)
+    name: economic-simulator                      # The name of the service/project
+    runtime: python                               # Runtime environment used for this service
+    plan: free                                    # Deployment plan (e.g. free tier)
+    buildCommand: pip install -r requirements.txt # Command to install dependencies
+    startCommand: gunicorn src.app:app            # Command to start the app with Gunicorn

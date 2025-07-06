@@ -1,20 +1,20 @@
-# Entorn virtual de Python
+# Python virtual environment
 .venv/
 
-# Fitxers temporals i compilats
+# Temporary and compiled files
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.so
 
-# Fitxers de configuració i secrets (si n'hi ha)
+# Configuration and secret files (if any)
 .env
 *.env
 config.local.*
 secrets.*
 
-# Dades temporals o grans
+# Temporary or large data files
 *.csv
 *.json
 *.xlsx
@@ -25,24 +25,24 @@ data/
 outputs/
 results/
 
-# Build i dist (si mai empaquetes)
+# Build and distribution (if you ever package the project)
 build/
 dist/
 *.egg-info/
 
-# IDEs i editors
+# IDEs and editors
 .vscode/
 .idea/
 *.sublime-workspace
 *.sublime-project
 
-# Jupyter Notebooks (si els fas servir)
+# Jupyter Notebooks (if you use them)
 .ipynb_checkpoints/
 
-# Recursos Dash (si generes dinàmicament dins assets)
+# Dash assets (if dynamically generated inside assets folder)
 assets/__pycache__/
 assets/*.map
 
-# Sistema operatiu
+# Operating system files
 .DS_Store
 Thumbs.db
