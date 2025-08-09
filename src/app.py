@@ -9,12 +9,12 @@ Initializes and configures the Dash web application for the Economy Simulator pr
 """
 
 from dash import Dash
-from dashboard.src.layout import layout
-from dashboard.src.callbacks import register_callbacks
+from src.layout import layout
+from src.callbacks import register_callbacks
 
 # Initialize Dash app
 app = Dash(__name__)
-app.title = "Economy Simulator"
+app.title = "Economy Network"
 
 # Set layout and callbacks
 app.layout = layout

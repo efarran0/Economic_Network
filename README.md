@@ -1,4 +1,4 @@
-# Economic Network Simulator
+# [Economic Network Simulator](https://economic-network.onrender.com)
 
 This project provides a simulation framework for modeling and visualizing intertemporal monetary flows in a closed economic network. It is based on agent-level utility optimization and developed as part of the Data Science Master's program at Universitat Oberta de Catalunya.
 
@@ -63,7 +63,7 @@ python -m src.app
 
 <br>
 
-Alternatively, you can explore the simulation directly through the [Render web application](https://economic-network-simulator.onrender.com/)
+Alternatively, you can explore the simulation directly through the [Render web application](https://economic-network.onrender.com)
 
 ## License
 
