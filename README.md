@@ -4,7 +4,7 @@ This project provides a simulation framework for modeling and visualizing intert
 
 ## Description
 
-This web application simulates a closed economy with two types of agents: **households** and **firms**. Behavioral rules are derived from the theoretical model detailed in *Annex A* of the associated academic paper.
+This web application simulates a closed economy with two types of agents: **households** and **firms**. Behavioral rules are derived from the theoretical model detailed in *Annex B* of the associated master thesis.
 
 The application is divided into two main screens:
 
@@ -61,7 +61,7 @@ pip install -r requirements.txt
 
 python -m src.app
 
-**5. Click on the running link**
+<br>
 
 Alternatively, you can explore the simulation directly through the [Render web application](https://economic-network-simulator.onrender.com/)
 

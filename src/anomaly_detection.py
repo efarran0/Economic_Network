@@ -5,60 +5,63 @@ This module provides functions to detect anomalies in time series data
 using seasonal decomposition and the Interquartile Range (IQR) method.
 """
 
-import pandas as pd
-import numpy as np
 import math
+import numpy as np
+import pandas as pd
+from typing import Sequence
 from statsmodels.tsa.seasonal import seasonal_decompose
+
 
 def iqr(residuals: pd.Series, factor: float = 1.5) -> bool:
     """
-    Detects whether the last value in the residuals series is an outlier based on the Interquartile Range (IQR) method.
+    Detects whether the latest value in a residual series is an outlier based on the IQR method.
 
     Parameters:
-    -----------
-    residuals : pd.Series
-        A pandas Series of residual values from a time series decomposition.
-    factor : float, optional (default=1.5)
-        The multiplier for the IQR to define the lower and upper bounds for outlier detection.
+        residuals (pd.Series): Series of residuals from time series decomposition.
+        factor (float): IQR multiplier to define outlier thresholds. Default is 1.5.
 
     Returns:
-    --------
-    bool
-        Whether the last value in residuals is an outlier.
+        bool: True if the last residual is an outlier, False otherwise.
     """
     q1 = np.percentile(residuals, 25)
     q3 = np.percentile(residuals, 75)
     iqr_range = q3 - q1
-    lower_bound = q1 - factor * iqr_range
-    upper_bound = q3 + factor * iqr_range
-    value = residuals.iloc[-1]
-    return bool((value < lower_bound) or (value > upper_bound))
+    lower = q1 - factor * iqr_range
+    upper = q3 + factor * iqr_range
+    return residuals.iloc[-1] < lower or residuals.iloc[-1] > upper
 
 
-def tsa(timeseries: list[float], model: str = "additive", seasonality: float = 0.05) -> bool:
+def detect_anomaly(
+    timeseries: Sequence[float],
+    model: str = "additive",
+    seasonality: float = 0.05,
+    iqr_factor: float = 1.5
+) -> bool:
     """
-    Performs seasonal decomposition of a time series and detects anomalies in the residuals using the IQR method.
+    Detects anomalies in a univariate time series using seasonal decomposition and IQR.
 
     Parameters:
-    -----------
-    timeseries : list of float
-        The time series data to analyze.
-    model : str, optional (default="additive")
-        The type of seasonal decomposition model to use. Options are 'additive' or 'multiplicative'.
-    seasonality : float, optional (default=0.05)
-        The estimated seasonality ratio (between 0 and 1) to determine the period of decomposition.
+        timeseries (Sequence[float]): Input time series data (e.g., list or array of floats).
+        model (str): Seasonal decomposition model; "additive" or "multiplicative". Default is "additive".
+        seasonality (float): Ratio (0–1) to estimate the seasonal period. Default is 0.05.
+        iqr_factor (float): IQR multiplier for outlier detection. Default is 1.5.
 
     Returns:
-    --------
-    bool
-        Whether an anomaly is detected in the residuals.
+        bool: True if an anomaly is detected in the latest residual, False otherwise.
     """
+    if not timeseries:
+        raise ValueError("Time series data must not be empty.")
+
     n = len(timeseries)
-    series = pd.Series(timeseries, index=pd.RangeIndex(n))
     period = max(2, math.ceil(n * seasonality))
-    result = seasonal_decompose(series,
-                                model=model,
-                                period=period,
-                                extrapolate_trend="freq")
-    residuals = result.resid.dropna()
-    return iqr(residuals)
+
+    series = pd.Series(timeseries, index=pd.RangeIndex(n))
+    decomposition = seasonal_decompose(
+        series, model=model, period=period, extrapolate_trend="freq"
+    )
+    residuals = decomposition.resid.dropna()
+
+    if residuals.empty:
+        raise ValueError("Residuals could not be computed from decomposition.")
+
+    return iqr(residuals, factor=iqr_factor)

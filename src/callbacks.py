@@ -1,41 +1,35 @@
 """
 Dash Callback Module for Interactive Economy Simulation
 
-This module registers callbacks for a Dash web app that simulates an economic network.
-It allows users to:
-- Start/stop simulations
-- Dynamically update system state over time
-- Visualize system matrix and time series of key economic parameters (alpha and rho)
-- Identify and display anomalies in economic dynamics
+This module registers callbacks for a Dash web app simulating an economic network.
+Features:
+- Start/stop simulation control
+- Dynamic state updates with intervals
+- Heatmap visualization of system matrix
+- Dual-axis time series plot of economic parameters (alpha and rho)
+- Anomaly/outlier detection and display
 
-Main functionalities:
-- Initializes an `EconomyNetwork` object upon simulation start
-- Steps the model forward in time based on a Dash interval component
-- Visualizes the evolving state as a heatmap and a dual-axis time series plot
-- Displays outlier detections for alpha and rho
-
-Requirements:
-- Dash
-- Plotly
-- NumPy
-- `EconomyNetwork` class from `src.sim`
+Dependencies:
+- Dash, Plotly, NumPy
+- EconomyNetwork class from dashboard.src.sim
 """
 
 import json
 import numpy as np
+from typing import Tuple, Union
 from dash import Input, Output, State, callback_context, no_update
 from dash.exceptions import PreventUpdate
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
-from src.sim import EconomyNetwork
+from dashboard.src.sim import EconomyNetwork
 
 
 def register_callbacks(app):
     """
-    Register Dash callbacks for controlling the simulation and updating the interface.
+    Register Dash callbacks to control simulation and update UI elements.
 
     Parameters:
-    - app (Dash): The Dash app instance on which to register the callbacks.
+        app (Dash): Dash app instance.
     """
 
     @app.callback(
@@ -61,25 +55,27 @@ def register_callbacks(app):
         State('mem_input', 'value'),
         prevent_initial_call=True
     )
-    def control_and_update(start_clicks, stop_clicks, n_intervals, alpha_slider, rho_slider,
-                           screen, econ_data, s_h, s_f, alpha_input, rho_input, sens, mem_input):
+    def control_and_update(
+        start_clicks: int,
+        stop_clicks: int,
+        n_intervals: int,
+        alpha_slider: float,
+        rho_slider: float,
+        screen: str,
+        econ_data: Union[str, None],
+        s_h: float,
+        s_f: float,
+        alpha_input: float,
+        rho_input: float,
+        sens: float,
+        mem_input: int
+    ) -> Tuple[str, Union[str, None], bool, go.Figure, go.Figure, float, float]:
         """
-        Main callback for controlling simulation and updating UI.
+        Controls simulation lifecycle and updates UI elements accordingly.
 
-        Handles:
-        - Initialization of the EconomyNetwork object on 'Start'
-        - Disabling simulation and UI on 'Stop'
-        - Advancing the simulation and updating visualizations on interval ticks or slider change
-
-        Returns:
-        - Updated screen state
-        - Serialized EconomyNetwork system state
-        - Interval enabled/disabled
-        - Matrix heatmap figure
-        - Alpha/Rho dual time series plot
-        - Updated alpha/rho values
+        Returns updated screen, serialized system state, interval enabled flag,
+        heatmap figure, time series figure, and current alpha/rho values.
         """
-
         ctx = callback_context
         if not ctx.triggered:
             raise PreventUpdate
@@ -87,30 +83,25 @@ def register_callbacks(app):
         trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
         if trigger_id == 'start_btn':
-            # Initialize a new simulation
             econ = EconomyNetwork([s_h, s_f], [alpha_input, rho_input], sens, mem_input)
             data = json.dumps(econ.sys)
             empty_fig = go.Figure()
             return 'sim', data, False, empty_fig, empty_fig, alpha_input, rho_input
 
         elif trigger_id == 'stop_btn':
-            # Stop simulation and return to set up screen
             return 'setup', no_update, True, no_update, no_update, no_update, no_update
 
-        elif trigger_id in ['interval-update', 'alpha-output', 'rho-output'] and screen == 'sim':
+        elif trigger_id in {'interval-update', 'alpha-output', 'rho-output'} and screen == 'sim':
             if not econ_data:
                 raise PreventUpdate
 
-            # Deserialize the system state and reinstantiate the model
             sys = json.loads(econ_data)
             econ = EconomyNetwork([0, 0], [0.5, 0.5], sens, mem_input)
             econ.sys = {int(k): v for k, v in sys.items()}
 
-            # Optional manual overrides from sliders
             alpha_override = alpha_slider if trigger_id == 'alpha-output' else None
             rho_override = rho_slider if trigger_id == 'rho-output' else None
 
-            # Advance simulation
             econ.step(alpha_override=alpha_override, rho_override=rho_override)
 
             t = max(econ.sys.keys())
@@ -119,18 +110,17 @@ def register_callbacks(app):
             if rho_override is not None:
                 econ.sys[t]['rho'] = rho_override
 
-            # Extract last N steps for plotting
-            t_vals = [x - max(econ.sys.keys()) for x in econ.sys.keys()]
+            t_vals = [x - t for x in econ.sys.keys()]
             alpha_vals = [round(v['alpha'], 2) for v in econ.sys.values()]
             rho_vals = [round(v['rho'], 2) for v in econ.sys.values()]
             t_plot = t_vals[-mem_input:]
             alpha_plot = alpha_vals[-mem_input:]
             rho_plot = rho_vals[-mem_input:]
 
-            # --- Create Heatmap of current matrix ---
+            # Heatmap figure
             matrix = econ.get_matrix()
             labels = np.array([['s_h', 'c'], ['w', 's_f']])
-            fig1 = go.Figure(data=go.Heatmap(
+            fig_heatmap = go.Figure(data=go.Heatmap(
                 z=matrix,
                 x=['households', 'firms'],
                 y=['households', 'firms'],
@@ -142,13 +132,12 @@ def register_callbacks(app):
                 zmin=0,
                 zmax=1
             ))
-            fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-            fig1.update_yaxes(autorange="reversed")
+            fig_heatmap.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+            fig_heatmap.update_yaxes(autorange="reversed")
 
-            # --- Create Combined Time Series Plot with Outliers ---
+            # Combined time series plot
             fig_combined = make_subplots(rows=1, cols=2, column_widths=[0.7, 0.3], horizontal_spacing=0.05)
 
-            # Time series traces
             fig_combined.add_trace(go.Scatter(x=t_plot, y=alpha_plot, name='α', mode='lines'), row=1, col=1)
             fig_combined.add_trace(go.Scatter(x=t_plot, y=rho_plot, name='ρ', mode='lines'), row=1, col=1)
 
@@ -162,12 +151,12 @@ def register_callbacks(app):
             )
             fig_combined.update_yaxes(title_text='Value', range=[0, 1], row=1, col=1)
 
-            # Vertical markers
+            # Markers on right plot
             fig_combined.add_trace(
-                go.Scatter(x=[1] * len(alpha_plot), y=alpha_plot, mode='markers',
+                go.Scatter(x=[1]*len(alpha_plot), y=alpha_plot, mode='markers',
                            marker=dict(color='blue', size=5), name='α'), row=1, col=2)
             fig_combined.add_trace(
-                go.Scatter(x=[2] * len(rho_plot), y=rho_plot, mode='markers',
+                go.Scatter(x=[2]*len(rho_plot), y=rho_plot, mode='markers',
                            marker=dict(color='red', size=5), name='ρ'), row=1, col=2)
 
             fig_combined.update_xaxes(
@@ -185,7 +174,7 @@ def register_callbacks(app):
             fig_combined.add_shape(type='line', x0=2, x1=2, y0=0, y1=1,
                                    line=dict(color='red', width=1, dash='dash'), row=1, col=2)
 
-            # Add outlier legend symbol (hidden point)
+            # Outlier legend symbol (hidden)
             fig_combined.add_trace(
                 go.Scatter(x=[None], y=[None], mode='markers',
                            marker=dict(color='firebrick', size=12, symbol='star'),
@@ -219,14 +208,18 @@ def register_callbacks(app):
                                    showlegend=False), row=1, col=2)
 
             fig_combined.update_layout(
-                title_text="Historical propensity data", title_x=0.5,
-                plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
-                showlegend=True, height=500
+                title_text="Historical propensity data",
+                title_x=0.5,
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                showlegend=True,
+                height=500
             )
+            # Hide legend for duplicate traces
             fig_combined['data'][2]['showlegend'] = False
             fig_combined['data'][3]['showlegend'] = False
 
-            return screen, json.dumps(econ.sys), False, fig1, fig_combined, alpha_vals[-1], rho_vals[-1]
+            return screen, json.dumps(econ.sys), False, fig_heatmap, fig_combined, alpha_vals[-1], rho_vals[-1]
 
         else:
             raise PreventUpdate
@@ -236,15 +229,15 @@ def register_callbacks(app):
         Output('sim-screen', 'style'),
         Input('screen', 'data')
     )
-    def toggle_screens(screen):
+    def toggle_screens(screen: str) -> Tuple[dict, dict]:
         """
-        Callback to toggle visibility between setup and simulation screens.
+        Toggle visibility of setup and simulation screens based on current screen state.
 
-        Parameters:
-        - screen (str): Screen state identifier ('setup' or 'sim').
+        Args:
+            screen (str): Current screen identifier ('setup' or 'sim').
 
         Returns:
-        - Two dictionaries for Dash component styles.
+            Tuple of two dicts for style properties of setup and sim screens.
         """
         if screen == 'setup':
             return {'display': 'block'}, {'display': 'none'}
