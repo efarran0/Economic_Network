@@ -1,38 +1,112 @@
-/* Import the 'Inter' font from Google Fonts with weights 400 (regular) and 600 (semibold) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+/*
+ * Stylesheet for the Economy Network Dash application.
+ *
+ * This CSS file defines the visual styling for the entire application,
+ * ensuring a consistent and clean look. It uses CSS custom properties
+ * (variables) for a centralized color palette and typography, which makes
+ * it easy to customize the theme.
+ *
+ * It also includes an automatic dark mode feature that adapts the colors
+ * based on the user's system preferences, enhancing accessibility.
+ */
 
-/* Base styles for the body element */
+/* ---------------------------------------------------- */
+/* Global Variables - Light Mode Defaults               */
+/* ---------------------------------------------------- */
+:root {
+    --bg-color: #f7f4ee;            /* Background color */
+    --text-color: #2e2e2e;          /* Primary text color */
+    --heading-color: #1f1f1f;       /* Headings color */
+    --label-color: #6a6a6a;         /* Label text color */
+    --border-color: #dcd6c9;        /* Input border color */
+    --font-family: 'Inter', Arial, sans-serif; /* Main font with fallback */
+
+    --base-font-size: 16px;         /* Default font size */
+    --base-line-height: 1.5;        /* Default line height */
+    --radius: 6px;                  /* Border radius for inputs */
+    --padding-input: 10px 12px;     /* Padding for inputs */
+
+    --focus-outline: #888;          /* Outline color for focus state */
+}
+
+/* ---------------------------------------------------- */
+/* Dark Mode - Automatic Theme Switch                   */
+/* ---------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1e1e1e;
+        --text-color: #e8e8e8;
+        --heading-color: #ffffff;
+        --label-color: #b5b5b5;
+        --border-color: #444;
+        --focus-outline: #bbb;
+    }
+}
+
+/* ---------------------------------------------------- */
+/* Base Styles                                           */
+/* ---------------------------------------------------- */
 body {
-    background-color: #f7f4ee;          /* Light beige background for a clean, soft look */
-    color: #2e2e2e;                     /* Dark gray text for good readability */
-    font-family: 'Inter', sans-serif;   /* Primary font family */
-    margin: 0;                          /* Remove default browser margin */
-    padding: 0;                         /* Remove default browser padding */
-    font-size: 16px;                    /* Base font size */
-    line-height: 1.5;                   /* Line height for better text readability */
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
+    font-size: var(--base-font-size);
+    line-height: var(--base-line-height);
 }
 
-/* Styles for headings (h1, h2, h3) */
+/* ---------------------------------------------------- */
+/* Headings Styles                                       */
+/* ---------------------------------------------------- */
 h1, h2, h3 {
-    color: #1f1f1f;                     /* Slightly darker text to highlight headings */
-    font-weight: 600;                   /* Semibold weight to distinguish headings from body text */
-    margin-bottom: 12px;                /* Space below headings for separation from other elements */
+    color: var(--heading-color);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
 }
 
-/* Styles for label elements */
+/* ---------------------------------------------------- */
+/* Labels Styles                                         */
+/* ---------------------------------------------------- */
 label {
-    color: #6a6a6a;                     /* Medium gray color to differentiate labels from main text */
-    margin-bottom: 6px;                 /* Spacing below label to separate from form fields */
-    font-size: 0.9rem;                  /* Slightly smaller than normal text for subtlety */
+    color: var(--label-color);
+    margin-bottom: 0.375rem;
+    font-size: 0.9rem;
+    display: block; /* Ensures correct spacing above inputs */
 }
 
-/* Styles for text and number input fields */
-input[type="text"], input[type="number"] {
-    background-color: #ffffff;          /* White background for clear input areas */
-    border: 1px solid #dcd6c9;          /* Light gray border for subtle separation */
-    color: #2e2e2e;                     /* Dark gray text for input readability */
-    padding: 10px 12px;                 /* Inner spacing for comfortable typing area */
-    border-radius: 6px;                 /* Slightly rounded corners for a modern look */
-    width: 100%;                        /* Make input fields span the full width of the container */
-    font-size: 1rem;                    /* Standard font size for inputs */
+/* ---------------------------------------------------- */
+/* Input Fields - Text and Number                        */
+/* ---------------------------------------------------- */
+input[type="text"],
+input[type="number"] {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: var(--padding-input);
+    border-radius: var(--radius);
+    width: 100%;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Dark mode background for inputs */
+@media (prefers-color-scheme: dark) {
+    input[type="text"],
+    input[type="number"] {
+        background-color: #2a2a2a;
+    }
+}
+
+/* Focus state for accessibility */
+input[type="text"]:focus,
+input[type="number"]:focus {
+    outline: 2px solid var(--focus-outline);
+    outline-offset: 2px;
+}
+
+/* Hover state for subtle feedback */
+input[type="text"]:hover,
+input[type="number"]:hover {
+    border-color: var(--focus-outline);
 }
