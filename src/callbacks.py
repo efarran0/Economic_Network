@@ -190,6 +190,7 @@ def register_callbacks(app) -> None:
                 colorscale=[[0.0, "#ffcccc"], [0.5, "#ccffff"], [1.0, "#ffcccc"]],
                 text=labels,
                 texttemplate="%{text}<br>(%{z:.2%})",
+                hoverinfo='none',
                 textfont={"size": 16, "color": "#4a4a4a"},
                 zmin=0,
                 zmax=1,
@@ -203,8 +204,10 @@ def register_callbacks(app) -> None:
             )
 
             # Time series plot (left subplot)
-            fig_combined.add_trace(go.Scatter(x=t_vals, y=alpha_vals, name='α', mode='lines'), row=1, col=1)
-            fig_combined.add_trace(go.Scatter(x=t_vals, y=rho_vals, name='ρ', mode='lines'), row=1, col=1)
+            fig_combined.add_trace(go.Scatter(x=t_vals, y=alpha_vals, name='α', mode='lines', hoverinfo='none'),
+                                   row=1, col=1)
+            fig_combined.add_trace(go.Scatter(x=t_vals, y=rho_vals, name='ρ', mode='lines', hoverinfo='none'),
+                                   row=1, col=1)
             fig_combined.update_xaxes(
                 title_text='Time (t)',
                 dtick=1,
@@ -235,13 +238,16 @@ def register_callbacks(app) -> None:
 
             # Add reference lines and hidden legend entry for outliers
             fig_combined.add_shape(type='line', x0=1, x1=1, y0=0, y1=1,
-                                   line=dict(color='blue', width=1, dash='dash'), row=1, col=2)
+                                   line=dict(color='blue', width=1, dash='dash'),
+                                   row=1, col=2)
             fig_combined.add_shape(type='line', x0=2, x1=2, y0=0, y1=1,
-                                   line=dict(color='red', width=1, dash='dash'), row=1, col=2)
+                                   line=dict(color='red', width=1, dash='dash'),
+                                   row=1, col=2)
             fig_combined.add_trace(
                 go.Scatter(x=[None], y=[None], mode='markers',
                            marker=dict(color='firebrick', size=12, symbol='star'),
-                           name='Outlier'), row=1, col=1
+                           name='Outlier'),
+                row=1, col=1
             )
 
             # Highlight outliers with a star marker
@@ -250,14 +256,18 @@ def register_callbacks(app) -> None:
                     fig_combined.add_trace(
                         go.Scatter(x=[t_vals[i]], y=[alpha_vals[i]], mode='markers',
                                    marker=dict(color='firebrick', size=12, symbol='star'),
-                                   showlegend=False), row=1, col=1
+                                   hoverinfo='none',
+                                   showlegend=False),
+                        row=1, col=1
                     )
             for i, is_out in enumerate(rho_outliers):
                 if is_out:
                     fig_combined.add_trace(
                         go.Scatter(x=[t_vals[i]], y=[rho_vals[i]], mode='markers',
                                    marker=dict(color='firebrick', size=12, symbol='star'),
-                                   showlegend=False), row=1, col=1
+                                   hoverinfo='none',
+                                   showlegend=False),
+                        row=1, col=1
                     )
 
             fig_combined.update_layout(
