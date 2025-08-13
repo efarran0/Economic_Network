@@ -1,6 +1,7 @@
 # Economic Network
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-rebeccapurple.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 
 This project provides a simulation framework for modeling and visualizing intertemporal monetary flows in a closed economic network. It is based on agent-level utility optimization and was developed as part of the Data Science Master's program at Universitat Oberta de Catalunya.
 
@@ -8,7 +9,7 @@ This project provides a simulation framework for modeling and visualizing intert
 
 ### Description
 
-This web application simulates a closed economy with two types of agents: **households** and **firms**. Their behavioral rules are derived from the theoretical model detailed in [*Annex B*](https://github.com/efarran0/Economic_Network/blob/main/pdf/memory.pdf) of the associated master's thesis, which outlines the core principles of agent interaction and utility optimization.
+This web application simulates a closed economy with two agents: **households** and **firms**. Their behavioral rules are derived from the theoretical model detailed in *Annex B* of the associated [master's thesis](https://github.com/efarran0/Economic_Network/blob/main/pdf/memory.pdf), which outlines the core principles of agent interaction and utility optimization.
 
 The application is divided into two main screens:
 
@@ -42,7 +43,7 @@ AI tools were employed as a collaborative partner to support key aspects of the 
 
 * **Code Generation**: For initial code snippets and boilerplate.
 * **Performance Optimization**: To identify and improve bottlenecks.
-* **Refactoring and Restructuring Assistance**: The core modules (`src/sim.py`, `src/layout.py`, `src/callbacks.py`) were refactored for improved readability, maintainability, and adherence to modern Python best practices.
+* **Refactoring and Restructuring Assistance**: To improve readability, maintainability, and adherence to modern Python best practices.
 
 ---
 
@@ -87,4 +88,8 @@ Or, alternatively, you can explore the simulation directly through the [Render w
 
 ## License
 
-This project is licensed under the [**MIT License**](https://github.com/efarran0/Economic_Network/blob/main/LICENSE)
+This project uses a dual-licensing model to ensure proper use and sharing of both software and research material.
+
+The **source code**, located in `/src` and related folders, is licensed under the [**MIT License**](https://github.com/efarran0/Economic_Network/blob/main/LICENSE#L5).
+
+The **academic content**, located in `/pdf`, including all text, figures, and research material, is licensed under the [**CC BY-SA 4.0 License**](https://github.com/efarran0/Economic_Network/blob/main/LICENSE#L30).
