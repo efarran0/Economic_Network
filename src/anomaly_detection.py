@@ -75,14 +75,7 @@ def detect_anomaly(
 
     Returns:
         bool: True if an anomaly is detected in the latest residual, False otherwise.
-
-    Raises:
-        ValueError: If the input time series is empty or if residuals cannot be computed.
     """
-    # Validate that the time series data is not empty
-    if not timeseries:
-        raise ValueError("Error: The input time series data must not be empty.")
-
     # Calculate the seasonal period based on the series length and seasonality factor
     n = len(timeseries)
     period = max(2, math.ceil(n * seasonality))
@@ -97,10 +90,6 @@ def detect_anomaly(
 
     # Extract residuals and remove any NaN values that may result from decomposition
     residuals = decomposition.resid.dropna()
-
-    # Validate that the residuals were successfully computed
-    if residuals.empty:
-        raise ValueError("Error: Residuals could not be computed from seasonal decomposition.")
 
     # Call the helper function to detect if the latest residual is an anomaly
     return _iqr(residuals, factor=iqr_factor)

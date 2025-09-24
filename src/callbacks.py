@@ -35,7 +35,6 @@ def register_callbacks(app) -> None:
     Parameters:
         app (Dash): The Dash application instance to which callbacks are registered.
     """
-
     @app.callback(
         Output('screen', 'data'),
         Output('econ-store', 'data'),
@@ -51,14 +50,12 @@ def register_callbacks(app) -> None:
         Input('rho-output', 'value'),
         State('screen', 'data'),
         State('econ-store', 'data'),
-        State('beta_input', 'value'),
-        State('delta_input', 'value'),
         State('savings_households_input', 'value'),
         State('savings_firms_input', 'value'),
         State('alpha_input', 'value'),
         State('rho_input', 'value'),
-        State('sens_input', 'value'),
-        State('mem_input', 'value'),
+        State('volatility_input', 'value'),
+        State('memory_input', 'value'),
         prevent_initial_call=True,
     )
     def control_and_update(
@@ -69,14 +66,12 @@ def register_callbacks(app) -> None:
             rho_slider: Optional[float],
             screen: str,
             econ_data: Optional[str],
-            beta_input: float,
-            delta_input: float,
             savings_households: float,
             savings_firms: float,
             alpha_input: float,
             rho_input: float,
-            sens: float,
-            mem_input: int,
+            volatility_input: float,
+            memory_input: int,
     ) -> Tuple[str, Optional[str], bool, go.Figure, go.Figure, Optional[float], Optional[float]]:
         """
         Manages the simulation lifecycle and updates the UI based on user interactions and time intervals.
@@ -93,14 +88,12 @@ def register_callbacks(app) -> None:
             rho_slider (Optional[float]): The current value of the rho slider.
             screen (str): The current screen being displayed ('setup' or 'sim').
             econ_data (Optional[str]): A JSON-serialized string of the simulation's history.
-            beta_input (float): The value from the beta input field.
-            delta_input (float): The value from the delta input field.
             savings_households (float): The value from the household savings input.
             savings_firms (float): The value from the firm savings input.
             alpha_input (float): The value from the initial alpha input field.
             rho_input (float): The value from the initial rho input field.
-            sens (float): The value from the volatility input field.
-            mem_input (int): The value from the memory size input field.
+            volatility_input (float): The value from the volatility input field.
+            memory_input (int): The value from the memory input field.
 
         Returns:
             Tuple: A tuple containing the updated state for the following outputs:
@@ -120,17 +113,31 @@ def register_callbacks(app) -> None:
 
         # Handle the start button click
         if trigger_id == 'start_btn':
+            # --- Input Validation ---
+            inputs = [
+                alpha_input,
+                rho_input,
+                savings_households,
+                savings_firms,
+                volatility_input,
+                memory_input
+            ]
+
+            if any(v is None for v in inputs):
+                raise PreventUpdate
+
             # Initialize a new EconomyNetwork instance with user-provided parameters
             econ = EconomyNetwork(
-                sens,
-                mem_input,
-                [beta_input, delta_input],
+                volatility_input,
+                memory_input,
                 [alpha_input, rho_input],
                 [savings_households, savings_firms],
             )
-            # Serialize the initial history and store it
+
+            # Serialize and store the initial simulation history
             data = json.dumps(list(econ.history))
-            # Return to switch to the simulation screen and enable the interval
+
+            # Transition to the simulation screen and enable periodic updates
             return 'sim', data, False, go.Figure(), go.Figure(), alpha_input, rho_input
 
         # Handle the stop button click
@@ -149,16 +156,15 @@ def register_callbacks(app) -> None:
 
             # Re-initialize the model with the last known parameters
             econ = EconomyNetwork(
-                sens,
-                mem_input,
-                [last_state["beta"], last_state["delta"]],
+                volatility_input,
+                memory_input,
                 [last_state["alpha"], last_state["rho"]],
                 [last_state["savings_households"], last_state["savings_firms"]],
                 last_state.get("consumption", 0),
                 last_state.get("wages", 0),
             )
             # Restore the full history
-            econ.history = deque(history_list, maxlen=mem_input)
+            econ.history = deque(history_list, maxlen=memory_input)
 
             # Determine if a slider override is active
             alpha_override = alpha_slider if trigger_id == 'alpha-output' else None
@@ -187,7 +193,7 @@ def register_callbacks(app) -> None:
                 z=matrix,
                 x=['households', 'firms'],
                 y=['households', 'firms'],
-                colorscale=[[0.0, "#ffcccc"], [0.5, "#ccffff"], [1.0, "#ffcccc"]],
+                colorscale=[[0.0, "#ffcccc"], [0.25, "#ccffff"], [1.0, "#ffcccc"]],
                 text=labels,
                 texttemplate="%{text}<br>(%{z:.2%})",
                 hoverinfo='none',
@@ -200,13 +206,13 @@ def register_callbacks(app) -> None:
 
             # === Combined Time Series Figure (Propensity Graph) ===
             fig_combined = make_subplots(
-                rows=1, cols=2, column_widths=[0.7, 0.3], horizontal_spacing=0.05
+                rows=1, cols=2, column_widths=[0.7, 0.3], horizontal_spacing=0.10
             )
 
             # Time series plot (left subplot)
-            fig_combined.add_trace(go.Scatter(x=t_vals, y=alpha_vals, name='α', mode='lines', hoverinfo='none'),
+            fig_combined.add_trace(go.Scatter(x=t_vals, y=alpha_vals, name='α', mode='lines', hoverinfo='none', showlegend=False),
                                    row=1, col=1)
-            fig_combined.add_trace(go.Scatter(x=t_vals, y=rho_vals, name='ρ', mode='lines', hoverinfo='none'),
+            fig_combined.add_trace(go.Scatter(x=t_vals, y=rho_vals, name='ρ', mode='lines', hoverinfo='none', showlegend=False),
                                    row=1, col=1)
             fig_combined.update_xaxes(
                 title_text='Time (t)',
@@ -214,21 +220,31 @@ def register_callbacks(app) -> None:
                 tickvals=t_vals,
                 ticktext=[str(v) if v != 0 else "now" for v in t_vals],
                 range=[min(t_vals), max(t_vals)],
-                row=1, col=1
+                showgrid=True,
+                gridcolor='lightgrey',
+                row=1,
+                col=1
             )
-            fig_combined.update_yaxes(title_text='Value', range=[0, 1], row=1, col=1)
+            fig_combined.update_yaxes(title_text='Value',
+                                      range=[0, 1],
+                                      showgrid=True,
+                                      gridcolor='lightgrey',
+                                      row=1,
+                                      col=1)
 
             # Latest value plot (right subplot)
             fig_combined.add_trace(
                 go.Scatter(x=[1] * len(alpha_vals), y=alpha_vals, mode='markers',
-                           marker=dict(color='blue', size=5), name='α'), row=1, col=2
+                           marker=dict(color='blue', size=5), name='α', hoverinfo='none', showlegend=False),
+                row=1, col=2
             )
             fig_combined.add_trace(
-                go.Scatter(x=[2] * len(rho_vals), y=rho_vals, mode='markers',
-                           marker=dict(color='red', size=5), name='ρ'), row=1, col=2
+                go.Scatter(x=[1.8] * len(rho_vals), y=rho_vals, mode='markers',
+                           marker=dict(color='red', size=5), name='ρ', hoverinfo='none', showlegend=False),
+                row=1, col=2
             )
             fig_combined.update_xaxes(
-                range=[0.5, 2.5], tickvals=[1, 2], ticktext=['α', 'ρ'],
+                range=[0.5, 2.5], tickvals=[1, 1.8], ticktext=['α', 'ρ'],
                 showgrid=False, zeroline=False, showticklabels=True, row=1, col=2
             )
             fig_combined.update_yaxes(
@@ -240,14 +256,22 @@ def register_callbacks(app) -> None:
             fig_combined.add_shape(type='line', x0=1, x1=1, y0=0, y1=1,
                                    line=dict(color='blue', width=1, dash='dash'),
                                    row=1, col=2)
-            fig_combined.add_shape(type='line', x0=2, x1=2, y0=0, y1=1,
+            fig_combined.add_shape(type='line', x0=1.8, x1=1.8, y0=0, y1=1,
                                    line=dict(color='red', width=1, dash='dash'),
                                    row=1, col=2)
-            fig_combined.add_trace(
-                go.Scatter(x=[None], y=[None], mode='markers',
-                           marker=dict(color='firebrick', size=12, symbol='star'),
-                           name='Outlier'),
-                row=1, col=1
+
+            # --- Annotation per Outlier ---
+            fig_combined.add_annotation(
+                x=0.77,
+                y=0.95,
+                xref='paper',
+                yref='paper',
+                text="★<br>Outlier",
+                showarrow=False,
+                align='center',
+                font=dict(size=14, color="firebrick"),
+                xanchor='right',
+                yanchor='top'
             )
 
             # Highlight outliers with a star marker
@@ -257,7 +281,8 @@ def register_callbacks(app) -> None:
                         go.Scatter(x=[t_vals[i]], y=[alpha_vals[i]], mode='markers',
                                    marker=dict(color='firebrick', size=12, symbol='star'),
                                    hoverinfo='none',
-                                   showlegend=False),
+                                   showlegend=False,
+                                   cliponaxis=False),
                         row=1, col=1
                     )
             for i, is_out in enumerate(rho_outliers):
@@ -266,17 +291,29 @@ def register_callbacks(app) -> None:
                         go.Scatter(x=[t_vals[i]], y=[rho_vals[i]], mode='markers',
                                    marker=dict(color='firebrick', size=12, symbol='star'),
                                    hoverinfo='none',
-                                   showlegend=False),
+                                   showlegend=False,
+                                   cliponaxis=False),
                         row=1, col=1
                     )
 
             fig_combined.update_layout(
                 title_text="Historical propensity data",
-                title_x=0.5,
+                title_x=0.45,
+                title_y=0.88,
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 showlegend=True,
-                height=500
+                height=500,
+                width=585,
+                legend=dict(
+                    x=0.75,
+                    y=0.95,
+                    xanchor='right',
+                    yanchor='top',
+                    bgcolor='rgba(255,255,255,0.5)',
+                    bordercolor='black',
+                    borderwidth=1
+                )
             )
 
             return screen, data, False, fig_heatmap, fig_combined, alpha_vals[-1], rho_vals[-1]

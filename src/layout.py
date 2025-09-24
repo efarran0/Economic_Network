@@ -41,36 +41,7 @@ layout = html.Div(
             id='setup-screen',
             children=[
                 html.H1("Economy Network - Setup"),
-                html.P("Adjust the initial parameters of the economic model."),
-
-                # --- Discount factors inputs (beta and delta) ---
-                html.Div([
-                    html.Label("Households discount factor (β):", style={'fontWeight': 'bold'}),
-                    dcc.Input(
-                        id='beta_input',
-                        type='number',
-                        placeholder='Format: %.2f',
-                        value=0.50,
-                        step=0.01,
-                        min=0.01,
-                        max=0.99,
-                        style={'display': 'block', 'width': '100%'}
-                    ),
-                ], style={'marginBottom': '15px'}),
-
-                html.Div([
-                    html.Label("Firms discount factor (δ):", style={'fontWeight': 'bold'}),
-                    dcc.Input(
-                        id='delta_input',
-                        type='number',
-                        placeholder='Format: %.2f',
-                        value=0.50,
-                        step=0.01,
-                        min=0.01,
-                        max=0.99,
-                        style={'display': 'block', 'width': '100%'}
-                    ),
-                ], style={'marginBottom': '15px'}),
+                html.P("Adjust the initial economic network parameters."),
 
                 # --- Initial propensities (alpha and rho) ---
                 html.Div([
@@ -132,12 +103,12 @@ layout = html.Div(
                 html.Div([
                     html.Label("Volatility:", style={'fontWeight': 'bold'}),
                     dcc.Input(
-                        id='sens_input',
+                        id='volatility_input',
                         type='number',
                         placeholder='Format: %.2f',
                         value=0.05,
                         step=0.01,
-                        min=0,
+                        min=0.01,
                         style={'display': 'block', 'width': '100%'}
                     ),
                 ], style={'marginBottom': '20px'}),
@@ -145,12 +116,12 @@ layout = html.Div(
                 html.Div([
                     html.Label("Memory:", style={'fontWeight': 'bold'}),
                     dcc.Input(
-                        id='mem_input',
+                        id='memory_input',
                         type='number',
                         placeholder='Format: %d',
                         value=5,
                         step=1,
-                        min=1,
+                        min=3,
                         style={'display': 'block', 'width': '100%'}
                     ),
                 ], style={'marginBottom': '20px'}),
