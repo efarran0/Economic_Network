@@ -13,6 +13,9 @@ __pycache__/
 *.env
 config.local.*
 secrets.*
+pdf/images/Benchmarking_figure.py
+pdf/images/Conceptual_space_figure.py
+pdf/Ref.pdf
 
 # Temporary or large data files
 *.csv

@@ -101,7 +101,7 @@ layout = html.Div(
 
                 # --- Volatility and memory inputs ---
                 html.Div([
-                    html.Label("Volatility:", style={'fontWeight': 'bold'}),
+                    html.Label("Propensity volatility:", style={'fontWeight': 'bold'}),
                     dcc.Input(
                         id='volatility_input',
                         type='number',
@@ -109,12 +109,13 @@ layout = html.Div(
                         value=0.05,
                         step=0.01,
                         min=0.01,
+                        max=0.99,
                         style={'display': 'block', 'width': '100%'}
                     ),
                 ], style={'marginBottom': '20px'}),
 
                 html.Div([
-                    html.Label("Memory:", style={'fontWeight': 'bold'}),
+                    html.Label("Time horizon:", style={'fontWeight': 'bold'}),
                     dcc.Input(
                         id='memory_input',
                         type='number',

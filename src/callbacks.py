@@ -193,7 +193,7 @@ def register_callbacks(app) -> None:
                 z=matrix,
                 x=['households', 'firms'],
                 y=['households', 'firms'],
-                colorscale=[[0.0, "#ffcccc"], [0.25, "#ccffff"], [1.0, "#ffcccc"]],
+                colorscale=[[0.0, "#fff59d"], [0.25, "#FAF9F6"], [1.0, "#cba6f7"]],
                 text=labels,
                 texttemplate="%{text}<br>(%{z:.2%})",
                 hoverinfo='none',
