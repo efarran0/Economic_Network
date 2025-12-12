@@ -1,8 +1,8 @@
 """
-Dash App Module for Interactive Economy Simulator.
+Dash App Module for Interactive Economic Simulator.
 
 This module initializes and configures the main Dash web application for the
-Economy Simulator project. It sets up the app's core components: the layout and
+Economic Simulator project. It sets up the app's core components: the layout and
 the callback logic.
 
 The main application instance `app` and the underlying Flask server `server`
@@ -27,7 +27,7 @@ from src.callbacks import register_callbacks
 # Initialize the Dash application with a unique name.
 # This name is used to find resources, and can be used for the page title.
 app = Dash(__name__)
-app.title = "Economy Network"
+app.title = "Economic Network"
 
 # --- Layout Assignment ---
 # Assign the application's layout, which defines the HTML structure.

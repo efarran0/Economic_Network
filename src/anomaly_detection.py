@@ -1,5 +1,5 @@
 """
-Anomaly Detection Module for Interactive Economy Simulator.
+Anomaly Detection Module for Interactive Economic Simulator.
 
 This module provides a robust set of functions to detect anomalies within
 univariate time series data. It leverages a two-step process: first, it

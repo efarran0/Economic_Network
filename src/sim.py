@@ -1,9 +1,9 @@
 """
-Dash Sim Module for Interactive Economy Simulator.
+Dash Sim Module for Interactive Economic Simulator.
 
-This module provides the `EconomyNetwork` class, which simulates a dynamic
+This module provides the `EconomicNetwork` class, which simulates a dynamic
 economic system. It models the interactions between households and firms,
-tracking key parameters like alpha, rho, savings, consumption, and wages.
+tracking key parameters like omegah, omegaf, savings, consumption, and wages.
 
 The simulation is designed to be stepped forward one timestep at a time,
 allowing for its seamless integration with a Dash-based user interface.
@@ -22,7 +22,7 @@ import numpy as np
 from src.anomaly_detection import detect_anomaly
 
 
-class EconomyNetwork:
+class EconomicNetwork:
     """
     Simulates a dynamic economic network with evolving parameters and anomaly detection.
 
@@ -32,7 +32,7 @@ class EconomyNetwork:
 
     Attributes:
         volatility_input (float): Volatility sensitivity, controlling the magnitude of random
-                      fluctuations in alpha and rho.
+                      fluctuations in omegah and omegaf.
         memory_input (int): The size of the historical memory window used for anomaly detection.
         history (Deque[Dict[str, Any]]): A double-ended queue storing the state of the
                                          simulation at each timestep, limited by `memory_input`.
@@ -49,15 +49,15 @@ class EconomyNetwork:
         wages_init: float = 0.0,
     ):
         """
-        Initializes a new EconomyNetwork simulation instance.
+        Initializes a new EconomicNetwork simulation instance.
 
         Parameters:
             volatility_input (float): A value greater than 0 that defines the volatility sensitivity
-                          of the system's parameters (alpha, rho).
+                          of the system's parameters (omegah, omegaf).
             memory_input (int): An integer greater than 1 that defines the size of the
                              history for anomaly detection.
-            propensities (List[float]): A list containing two float values: [alpha, rho].
-                                Alpha is the household's propensity to consume, rho is the firm's.
+            propensities (List[float]): A list containing two float values: [omegah, omegaf].
+                                omegah is the household's propensity to consume, omegaf is the firm's.
                                 Both must be in the range [0, 1].
             savings (List[float]): A list containing two float values: [household_savings, firm_savings].
             consumption_init (float): The initial consumption value.
@@ -71,9 +71,9 @@ class EconomyNetwork:
 
         # Define the initial state of the simulation
         initial_state = {
-            "alpha": propensities[0],
-            "rho": propensities[1],
-            "outliers": {"alpha": [False], "rho": [False]},
+            "omegah": propensities[0],
+            "omegaf": propensities[1],
+            "outliers": {"omegah": [False], "omegaf": [False]},
             "savings_households": savings[0],
             "savings_firms": savings[1],
             "consumption": consumption_init,
@@ -88,7 +88,7 @@ class EconomyNetwork:
         Retrieves a list of recent values for a specified key from the simulation history.
 
         Parameters:
-            key (str): The state key (e.g., 'alpha', 'rho', 'consumption') for which
+            key (str): The state key (e.g., 'omegah', 'omegaf', 'consumption') for which
                        to retrieve historical data.
 
         Returns:
@@ -96,71 +96,71 @@ class EconomyNetwork:
         """
         return [state[key] for state in self.history]
 
-    def step(self, alpha_override: Optional[float] = None, rho_override: Optional[float] = None) -> None:
+    def step(self, omegah_override: Optional[float] = None, omegaf_override: Optional[float] = None) -> None:
         """
         Advances the simulation by one timestep.
 
-        This method updates the simulation's state, including the parameters alpha and rho,
+        This method updates the simulation's state, including the parameters omegah and omegaf,
         consumption, wages, and savings. It also performs anomaly detection on the
         updated parameters if the history is sufficiently long.
 
         Parameters:
-            alpha_override (Optional[float]): An optional float value to manually set the
-                                               new alpha for this timestep. Must be in [0, 1].
-            rho_override (Optional[float]): An optional float value to manually set the
-                                             new rho for this timestep. Must be in [0, 1].
+            omegah_override (Optional[float]): An optional float value to manually set the
+                                               new omegah for this timestep. Must be in [0, 1].
+            omegaf_override (Optional[float]): An optional float value to manually set the
+                                             new omegaf for this timestep. Must be in [0, 1].
         """
         prev = self.history[-1]
 
-        # Update alpha and rho with random volatility, or use an override value
-        alpha = (
-            alpha_override
-            if alpha_override is not None
-            else max(0.01, min(0.99, prev["alpha"] + random.uniform(-self.volatility_input, self.volatility_input)))
+        # Update omegah and omegaf with random volatility, or use an override value
+        omegah = (
+            omegah_override
+            if omegah_override is not None
+            else max(0.01, min(0.99, prev["omegah"] + random.uniform(-self.volatility_input, self.volatility_input)))
         )
-        rho = (
-            rho_override
-            if rho_override is not None
-            else max(0.01, min(0.99, prev["rho"] + random.uniform(-self.volatility_input, self.volatility_input)))
+        omegaf = (
+            omegaf_override
+            if omegaf_override is not None
+            else max(0.01, min(0.99, prev["omegaf"] + random.uniform(-self.volatility_input, self.volatility_input)))
         )
 
         # --- Economic Model Calculations ---
 
-        factor = (1/alpha * 1/rho - 1) ** -1
+        factor = (1/omegah * 1/omegaf - 1) ** -1
 
         # Calculate consumption based on wages, household savings, and the household factor
-        consumption = factor * (1/rho * prev["savings_households"] + prev["savings_firms"])
+        consumption = factor * (1/omegaf * prev["savings_households"] + prev["savings_firms"])
 
         # Calculate wages based on savings and the derived factors
-        wages = factor * (prev["savings_households"] + 1/alpha * prev["savings_firms"])
+        wages = factor * (prev["savings_households"] + 1/omegah * prev["savings_firms"])
 
         # Update savings based on consumption and wages
-        savings_households = (1/alpha - 1) * consumption
-        savings_firms = (1/rho - 1) * wages
+        savings_households = (1/omegah - 1) * consumption
+        savings_firms = (1/omegaf - 1) * wages
 
         # --- Anomaly Detection ---
         # Only run anomaly detection if the history is at its maximum length
         if len(self.history) == self.memory_input:
-            alpha_vals = self.get_values("alpha") + [alpha]
-            rho_vals = self.get_values("rho") + [rho]
-            alpha_out = detect_anomaly(alpha_vals)
-            rho_out = detect_anomaly(rho_vals)
+            omegah_vals = self.get_values("omegah") + [omegah]
+            omegaf_vals = self.get_values("omegaf") + [omegaf]
+            omegah_out = detect_anomaly(omegah_vals)
+            omegaf_out = detect_anomaly(omegaf_vals)
             outliers = {
-                "alpha": (prev["outliers"]["alpha"] + [alpha_out])[-self.memory_input:],
-                "rho": (prev["outliers"]["rho"] + [rho_out])[-self.memory_input:],
+                "omegah": (prev["outliers"]["omegah"] + [omegah_out])[-self.memory_input:],
+                "omegaf": (prev["outliers"]["omegaf"] + [omegaf_out])[-self.memory_input:],
             }
         else:
             # If history is not yet full, initialize outliers as False
             outliers = {
-                "alpha": prev["outliers"]["alpha"] + [False],
-                "rho": prev["outliers"]["rho"] + [False],
+                "omegah": prev["outliers"]["omegah"] + [False],
+                "omegaf": prev["outliers"]["omegaf"] + [False],
             }
 
         # --- State Update ---
         self.t += 1
         state = {
-            "alpha": alpha,
-            "rho": rho,
+            "omegah": omegah,
+            "omegaf": omegaf,
             "outliers": outliers,
             "savings_households": savings_households,
             "savings_firms": savings_firms,

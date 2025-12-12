@@ -25,7 +25,7 @@ from dash.exceptions import PreventUpdate
 from plotly.subplots import make_subplots
 
 # Local application imports
-from src.sim import EconomyNetwork
+from src.sim import EconomicNetwork
 
 
 def register_callbacks(app) -> None:
@@ -41,19 +41,19 @@ def register_callbacks(app) -> None:
         Output('interval-update', 'disabled'),
         Output('matrix-graph', 'figure'),
         Output('propensity-graph', 'figure'),
-        Output('alpha-output', 'value'),
-        Output('rho-output', 'value'),
+        Output('omegah-output', 'value'),
+        Output('omegaf-output', 'value'),
         Input('start_btn', 'n_clicks'),
         Input('stop_btn', 'n_clicks'),
         Input('interval-update', 'n_intervals'),
-        Input('alpha-output', 'value'),
-        Input('rho-output', 'value'),
+        Input('omegah-output', 'value'),
+        Input('omegaf-output', 'value'),
         State('screen', 'data'),
         State('econ-store', 'data'),
         State('savings_households_input', 'value'),
         State('savings_firms_input', 'value'),
-        State('alpha_input', 'value'),
-        State('rho_input', 'value'),
+        State('omegah_input', 'value'),
+        State('omegaf_input', 'value'),
         State('volatility_input', 'value'),
         State('memory_input', 'value'),
         prevent_initial_call=True,
@@ -62,14 +62,14 @@ def register_callbacks(app) -> None:
             start_clicks: int,
             stop_clicks: int,
             n_intervals: int,
-            alpha_slider: Optional[float],
-            rho_slider: Optional[float],
+            omegah_slider: Optional[float],
+            omegaf_slider: Optional[float],
             screen: str,
             econ_data: Optional[str],
             savings_households: float,
             savings_firms: float,
-            alpha_input: float,
-            rho_input: float,
+            omegah_input: float,
+            omegaf_input: float,
             volatility_input: float,
             memory_input: int,
     ) -> Tuple[str, Optional[str], bool, go.Figure, go.Figure, Optional[float], Optional[float]]:
@@ -84,14 +84,14 @@ def register_callbacks(app) -> None:
             start_clicks (int): Number of clicks on the 'Start simulation' button.
             stop_clicks (int): Number of clicks on the 'Stop and go back' button.
             n_intervals (int): The number of intervals elapsed since the simulation started.
-            alpha_slider (Optional[float]): The current value of the alpha slider.
-            rho_slider (Optional[float]): The current value of the rho slider.
+            omegah_slider (Optional[float]): The current value of the omegah slider.
+            omegaf_slider (Optional[float]): The current value of the omegaf slider.
             screen (str): The current screen being displayed ('setup' or 'sim').
             econ_data (Optional[str]): A JSON-serialized string of the simulation's history.
             savings_households (float): The value from the household savings input.
             savings_firms (float): The value from the firm savings input.
-            alpha_input (float): The value from the initial alpha input field.
-            rho_input (float): The value from the initial rho input field.
+            omegah_input (float): The value from the initial omegah input field.
+            omegaf_input (float): The value from the initial omegaf input field.
             volatility_input (float): The value from the volatility input field.
             memory_input (int): The value from the memory input field.
 
@@ -102,8 +102,8 @@ def register_callbacks(app) -> None:
                    - interval disabled flag
                    - heatmap figure
                    - propensity graph figure
-                   - alpha slider value
-                   - rho slider value
+                   - omegah slider value
+                   - omegaf slider value
         """
         ctx = callback_context
         if not ctx.triggered:
@@ -115,8 +115,8 @@ def register_callbacks(app) -> None:
         if trigger_id == 'start_btn':
             # --- Input Validation ---
             inputs = [
-                alpha_input,
-                rho_input,
+                omegah_input,
+                omegaf_input,
                 savings_households,
                 savings_firms,
                 volatility_input,
@@ -126,11 +126,11 @@ def register_callbacks(app) -> None:
             if any(v is None for v in inputs):
                 raise PreventUpdate
 
-            # Initialize a new EconomyNetwork instance with user-provided parameters
-            econ = EconomyNetwork(
+            # Initialize a new EconomicNetwork instance with user-provided parameters
+            econ = EconomicNetwork(
                 volatility_input,
                 memory_input,
-                [alpha_input, rho_input],
+                [omegah_input, omegaf_input],
                 [savings_households, savings_firms],
             )
 
@@ -138,7 +138,7 @@ def register_callbacks(app) -> None:
             data = json.dumps(list(econ.history))
 
             # Transition to the simulation screen and enable periodic updates
-            return 'sim', data, False, go.Figure(), go.Figure(), alpha_input, rho_input
+            return 'sim', data, False, go.Figure(), go.Figure(), omegah_input, omegaf_input
 
         # Handle the stop button click
         elif trigger_id == 'stop_btn':
@@ -146,19 +146,19 @@ def register_callbacks(app) -> None:
             return 'setup', None, True, go.Figure(), go.Figure(), None, None
 
         # Handle simulation updates or slider changes
-        elif trigger_id in {'interval-update', 'alpha-output', 'rho-output'} and screen == 'sim':
+        elif trigger_id in {'interval-update', 'omegah-output', 'omegaf-output'} and screen == 'sim':
             if not econ_data:
                 raise PreventUpdate
 
-            # Reconstruct the EconomyNetwork instance from the serialized data
+            # Reconstruct the EconomicNetwork instance from the serialized data
             history_list = json.loads(econ_data)
             last_state = history_list[-1]
 
             # Re-initialize the model with the last known parameters
-            econ = EconomyNetwork(
+            econ = EconomicNetwork(
                 volatility_input,
                 memory_input,
-                [last_state["alpha"], last_state["rho"]],
+                [last_state["omegah"], last_state["omegaf"]],
                 [last_state["savings_households"], last_state["savings_firms"]],
                 last_state.get("consumption", 0),
                 last_state.get("wages", 0),
@@ -167,11 +167,11 @@ def register_callbacks(app) -> None:
             econ.history = deque(history_list, maxlen=memory_input)
 
             # Determine if a slider override is active
-            alpha_override = alpha_slider if trigger_id == 'alpha-output' else None
-            rho_override = rho_slider if trigger_id == 'rho-output' else None
+            omegah_override = omegah_slider if trigger_id == 'omegah-output' else None
+            omegaf_override = omegaf_slider if trigger_id == 'omegaf-output' else None
 
             # Advance the simulation by one step
-            econ.step(alpha_override=alpha_override, rho_override=rho_override)
+            econ.step(omegah_override=omegah_override, omegaf_override=omegaf_override)
 
             # Reserialize the updated history
             data = json.dumps(list(econ.history))
@@ -179,12 +179,12 @@ def register_callbacks(app) -> None:
             # --- Plot Generation ---
             # Extract data from history for plotting
             t_vals = list(range(-len(econ.history) + 1, 1))
-            alpha_vals = [round(s['alpha'], 2) for s in econ.history]
-            rho_vals = [round(s['rho'], 2) for s in econ.history]
+            omegah_vals = [round(s['omegah'], 2) for s in econ.history]
+            omegaf_vals = [round(s['omegaf'], 2) for s in econ.history]
 
             # Extract outlier data for highlighting
-            alpha_outliers: List[Any] = econ.history[-1].get('outliers', {}).get('alpha', [])
-            rho_outliers: List[Any] = econ.history[-1].get('outliers', {}).get('rho', [])
+            omegah_outliers: List[Any] = econ.history[-1].get('outliers', {}).get('omegah', [])
+            omegaf_outliers: List[Any] = econ.history[-1].get('outliers', {}).get('omegaf', [])
 
             # === Heatmap Figure ===
             matrix = econ.get_matrix()
@@ -210,9 +210,9 @@ def register_callbacks(app) -> None:
             )
 
             # Time series plot (left subplot)
-            fig_combined.add_trace(go.Scatter(x=t_vals, y=alpha_vals, name='α', mode='lines', hoverinfo='none', showlegend=False),
+            fig_combined.add_trace(go.Scatter(x=t_vals, y=omegah_vals, name='α', mode='lines', hoverinfo='none', showlegend=False),
                                    row=1, col=1)
-            fig_combined.add_trace(go.Scatter(x=t_vals, y=rho_vals, name='ρ', mode='lines', hoverinfo='none', showlegend=False),
+            fig_combined.add_trace(go.Scatter(x=t_vals, y=omegaf_vals, name='ρ', mode='lines', hoverinfo='none', showlegend=False),
                                    row=1, col=1)
             fig_combined.update_xaxes(
                 title_text='Time (t)',
@@ -234,12 +234,12 @@ def register_callbacks(app) -> None:
 
             # Latest value plot (right subplot)
             fig_combined.add_trace(
-                go.Scatter(x=[1] * len(alpha_vals), y=alpha_vals, mode='markers',
+                go.Scatter(x=[1] * len(omegah_vals), y=omegah_vals, mode='markers',
                            marker=dict(color='blue', size=5), name='α', hoverinfo='none', showlegend=False),
                 row=1, col=2
             )
             fig_combined.add_trace(
-                go.Scatter(x=[1.8] * len(rho_vals), y=rho_vals, mode='markers',
+                go.Scatter(x=[1.8] * len(omegaf_vals), y=omegaf_vals, mode='markers',
                            marker=dict(color='red', size=5), name='ρ', hoverinfo='none', showlegend=False),
                 row=1, col=2
             )
@@ -275,20 +275,20 @@ def register_callbacks(app) -> None:
             )
 
             # Highlight outliers with a star marker
-            for i, is_out in enumerate(alpha_outliers):
+            for i, is_out in enumerate(omegah_outliers):
                 if is_out:
                     fig_combined.add_trace(
-                        go.Scatter(x=[t_vals[i]], y=[alpha_vals[i]], mode='markers',
+                        go.Scatter(x=[t_vals[i]], y=[omegah_vals[i]], mode='markers',
                                    marker=dict(color='firebrick', size=12, symbol='star'),
                                    hoverinfo='none',
                                    showlegend=False,
                                    cliponaxis=False),
                         row=1, col=1
                     )
-            for i, is_out in enumerate(rho_outliers):
+            for i, is_out in enumerate(omegaf_outliers):
                 if is_out:
                     fig_combined.add_trace(
-                        go.Scatter(x=[t_vals[i]], y=[rho_vals[i]], mode='markers',
+                        go.Scatter(x=[t_vals[i]], y=[omegaf_vals[i]], mode='markers',
                                    marker=dict(color='firebrick', size=12, symbol='star'),
                                    hoverinfo='none',
                                    showlegend=False,
@@ -316,7 +316,7 @@ def register_callbacks(app) -> None:
                 )
             )
 
-            return screen, data, False, fig_heatmap, fig_combined, alpha_vals[-1], rho_vals[-1]
+            return screen, data, False, fig_heatmap, fig_combined, omegah_vals[-1], omegaf_vals[-1]
 
         else:
             raise PreventUpdate

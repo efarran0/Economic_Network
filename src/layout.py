@@ -1,5 +1,5 @@
 """
-Dash Layout Module for Interactive Economy Network.
+Dash Layout Module for Interactive Economic Network.
 
 This module defines the visual structure (layout) of the Dash application.
 It separates the user interface into two main sections: a setup screen for
@@ -23,7 +23,7 @@ layout = html.Div(
         # for storing data and state that needs to be shared between callbacks.
         dcc.Store(
             id='econ-store',
-            data=None,  # This will store the serialized EconomyNetwork object.
+            data=None,  # This will store the serialized EconomicNetwork object.
         ),
         dcc.Store(
             id='screen',
@@ -40,14 +40,14 @@ layout = html.Div(
         html.Div(
             id='setup-screen',
             children=[
-                html.H1("Economy Network - Setup"),
-                html.P("Adjust the initial economic network parameters."),
+                html.H1("Economic Network - Setup"),
+                html.P("Initial economic network parameters adjustment."),
 
-                # --- Initial propensities (alpha and rho) ---
+                # --- Initial propensities (omegah and omegaf) ---
                 html.Div([
-                    html.Label("Initial consumption propensity (α):", style={'fontWeight': 'bold'}),
+                    html.Label("Initial consumption propensity (Ωʰ):", style={'fontWeight': 'bold'}),
                     dcc.Input(
-                        id='alpha_input',
+                        id='omegah_input',
                         type='number',
                         placeholder='Format: %.2f',
                         value=0.50,
@@ -59,9 +59,9 @@ layout = html.Div(
                 ], style={'marginBottom': '15px'}),
 
                 html.Div([
-                    html.Label("Initial salary payment propensity (ρ):", style={'fontWeight': 'bold'}),
+                    html.Label("Initial salary payment propensity (Ωᶠ):", style={'fontWeight': 'bold'}),
                     dcc.Input(
-                        id='rho_input',
+                        id='omegaf_input',
                         type='number',
                         placeholder='Format: %.2f',
                         value=0.50,
@@ -101,7 +101,7 @@ layout = html.Div(
 
                 # --- Volatility and memory inputs ---
                 html.Div([
-                    html.Label("Propensity volatility:", style={'fontWeight': 'bold'}),
+                    html.Label("Propensities volatility:", style={'fontWeight': 'bold'}),
                     dcc.Input(
                         id='volatility_input',
                         type='number',
@@ -142,7 +142,7 @@ layout = html.Div(
         html.Div(
             id='sim-screen',
             children=[
-                html.H1("Economy Network - Dashboard"),
+                html.H1("Economic Network - Dashboard"),
                 html.Button('Stop and go back', id='stop_btn', n_clicks=0),
 
                 html.Div([
@@ -157,9 +157,9 @@ layout = html.Div(
                     # Controls and propensity graph (right side)
                     html.Div(
                         [
-                            html.Label("α (editable):", style={'fontWeight': 'bold'}),
+                            html.Label("Ωʰ (editable):", style={'fontWeight': 'bold'}),
                             dcc.Slider(
-                                id='alpha-output',
+                                id='omegah-output',
                                 min=0.01,
                                 max=0.99,
                                 step=0.01,
@@ -168,9 +168,9 @@ layout = html.Div(
                                 tooltip={"always_visible": True, "placement": "bottom"},
                                 className='danger-gradient-slider'
                             ),
-                            html.Label("ρ (editable):", style={'fontWeight': 'bold'}),
+                            html.Label("Ωᶠ (editable):", style={'fontWeight': 'bold'}),
                             dcc.Slider(
-                                id='rho-output',
+                                id='omegaf-output',
                                 min=0.01,
                                 max=0.99,
                                 step=0.01,
