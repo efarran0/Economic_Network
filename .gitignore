@@ -13,12 +13,12 @@ __pycache__/
 *.env
 config.local.*
 secrets.*
-pdf/images/Benchmarking_figure.py
-pdf/images/Conceptual_space_figure.py
-pdf/Ref.pdf
+pdf/images/*.py
 
 # Temporary or large data files
 *.csv
+*.docx
+*.pptx
 *.json
 *.xlsx
 *.db
@@ -28,7 +28,7 @@ data/
 outputs/
 results/
 
-# Build and distribution (if you ever package the project)
+# Build and distribution
 build/
 dist/
 *.egg-info/
@@ -39,10 +39,10 @@ dist/
 *.sublime-workspace
 *.sublime-project
 
-# Jupyter Notebooks (if you use them)
+# Jupyter Notebooks
 .ipynb_checkpoints/
 
-# Dash assets (if dynamically generated inside assets folder)
+# Dash assets
 assets/__pycache__/
 assets/*.map
 
