@@ -161,7 +161,7 @@ def register_callbacks(app) -> None:
                 [last_state["omegah"], last_state["omegaf"]],
                 [last_state["savings_household"], last_state["savings_firm"]],
                 last_state.get("consumption", 0),
-                last_state.get("wages", 0),
+                last_state.get("wage", 0),
             )
             # Restore the full history
             econ.history = deque(history_list, maxlen=memory_input)
@@ -188,7 +188,7 @@ def register_callbacks(app) -> None:
 
             # === Heatmap Figure ===
             matrix = econ.get_matrix()
-            labels = np.array([['savings_household', 'consumption'], ['wages', 'savings_firm']])
+            labels = np.array([['savings_household', 'consumption'], ['wage', 'savings_firm']])
             fig_heatmap = go.Figure(data=go.Heatmap(
                 z=matrix,
                 x=['household', 'firm'],

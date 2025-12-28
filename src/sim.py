@@ -2,8 +2,8 @@
 Dash Sim Module for Interactive Economic Simulator.
 
 This module provides the `EconomicNetwork` class, which simulates a dynamic
-economic system. It models the interactions between households and firms,
-tracking key parameters like omegah, omegaf, savings, consumption, and wages.
+economic system. It models the interactions between household and firm,
+tracking key parameters like omegah, omegaf, savings, consumption, and wage.
 
 The simulation is designed to be stepped forward one timestep at a time,
 allowing for its seamless integration with a Dash-based user interface.
@@ -28,7 +28,7 @@ class EconomicNetwork:
 
     The simulation maintains a history of its state, allowing for the detection of
     outliers in key economic indicators. It uses a simple model to update
-    consumption, wages, and savings based on propensity and discount factors.
+    consumption, wage, and savings based on propensity and discount factors.
 
     Attributes:
         volatility_input (float): Volatility sensitivity, controlling the magnitude of random
@@ -46,7 +46,7 @@ class EconomicNetwork:
         propensities: List[float],
         savings: List[float],
         consumption_init: float = 0.0,
-        wages_init: float = 0.0,
+        wage_init: float = 0.0,
     ):
         """
         Initializes a new EconomicNetwork simulation instance.
@@ -61,7 +61,7 @@ class EconomicNetwork:
                                 Both must be in the range [0, 1].
             savings (List[float]): A list containing two float values: [household_savings, firm_savings].
             consumption_init (float): The initial consumption value.
-            wages_init (float): The initial wages value.
+            wage_init (float): The initial wage value.
         """
 
         # --- Instance Attribute Initialization ---
@@ -74,10 +74,10 @@ class EconomicNetwork:
             "omegah": propensities[0],
             "omegaf": propensities[1],
             "outliers": {"omegah": [False], "omegaf": [False]},
-            "savings_households": savings[0],
-            "savings_firms": savings[1],
+            "savings_household": savings[0],
+            "savings_firm": savings[1],
             "consumption": consumption_init,
-            "wages": wages_init,
+            "wage": wage_init,
         }
 
         # Initialize the history deque with the initial state
@@ -101,7 +101,7 @@ class EconomicNetwork:
         Advances the simulation by one timestep.
 
         This method updates the simulation's state, including the parameters omegah and omegaf,
-        consumption, wages, and savings. It also performs anomaly detection on the
+        consumption, wage, and savings. It also performs anomaly detection on the
         updated parameters if the history is sufficiently long.
 
         Parameters:
@@ -128,15 +128,15 @@ class EconomicNetwork:
 
         factor = (1/omegah * 1/omegaf - 1) ** -1
 
-        # Calculate consumption based on wages, household savings, and the household factor
-        consumption = factor * (1/omegaf * prev["savings_households"] + prev["savings_firms"])
+        # Calculate consumption based on wage, household savings, and the household factor
+        consumption = factor * (1/omegaf * prev["savings_household"] + prev["savings_firm"])
 
-        # Calculate wages based on savings and the derived factors
-        wages = factor * (prev["savings_households"] + 1/omegah * prev["savings_firms"])
+        # Calculate wage based on savings and the derived factors
+        wage = factor * (prev["savings_household"] + 1/omegah * prev["savings_firm"])
 
-        # Update savings based on consumption and wages
-        savings_households = (1/omegah - 1) * consumption
-        savings_firms = (1/omegaf - 1) * wages
+        # Update savings based on consumption and wage
+        savings_household = (1/omegah - 1) * consumption
+        savings_firm = (1/omegaf - 1) * wage
 
         # --- Anomaly Detection ---
         # Only run anomaly detection if the history is at its maximum length
@@ -162,10 +162,10 @@ class EconomicNetwork:
             "omegah": omegah,
             "omegaf": omegaf,
             "outliers": outliers,
-            "savings_households": savings_households,
-            "savings_firms": savings_firms,
+            "savings_household": savings_household,
+            "savings_firm": savings_firm,
             "consumption": consumption,
-            "wages": wages,
+            "wage": wage,
         }
 
         # Add the new state to the history
@@ -175,10 +175,10 @@ class EconomicNetwork:
         """
         Returns a normalized 2x2 matrix representing the current economic state.
 
-        The matrix maps the flow of value between households and firms.
+        The matrix maps the flow of value between household and firm.
         Matrix structure:
-            [[savings_households, consumption],
-             [wages,              savings_firms]]
+            [[savings_household, consumption],
+             [wage,              savings_firm]]
 
         Returns:
             np.ndarray: A 2x2 NumPy array with normalized values. If the total
@@ -187,15 +187,15 @@ class EconomicNetwork:
         now = self.history[-1]
         total = (
             now["consumption"] +
-            now["wages"] +
-            now["savings_households"] +
-            now["savings_firms"]
+            now["wage"] +
+            now["savings_household"] +
+            now["savings_firm"]
         )
 
         if total == 0:
             return np.zeros((2, 2))
 
         return np.array([
-            [now["savings_households"] / total, now["consumption"] / total],
-            [now["wages"] / total, now["savings_firms"] / total],
+            [now["savings_household"] / total, now["consumption"] / total],
+            [now["wage"] / total, now["savings_firm"] / total],
         ])
