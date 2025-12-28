@@ -74,9 +74,9 @@ layout = html.Div(
 
                 # --- Initial savings inputs ---
                 html.Div([
-                    html.Label("Initial households savings:", style={'fontWeight': 'bold'}),
+                    html.Label("Initial household savings:", style={'fontWeight': 'bold'}),
                     dcc.Input(
-                        id='savings_households_input',
+                        id='savings_household_input',
                         type='number',
                         placeholder='Format: %d',
                         value=100,
@@ -87,9 +87,9 @@ layout = html.Div(
                 ], style={'marginBottom': '15px'}),
 
                 html.Div([
-                    html.Label("Initial firms savings:", style={'fontWeight': 'bold'}),
+                    html.Label("Initial firm savings:", style={'fontWeight': 'bold'}),
                     dcc.Input(
-                        id='savings_firms_input',
+                        id='savings_firm_input',
                         type='number',
                         placeholder='Format: %d',
                         value=0,

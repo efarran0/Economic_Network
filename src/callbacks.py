@@ -50,8 +50,8 @@ def register_callbacks(app) -> None:
         Input('omegaf-output', 'value'),
         State('screen', 'data'),
         State('econ-store', 'data'),
-        State('savings_households_input', 'value'),
-        State('savings_firms_input', 'value'),
+        State('savings_household_input', 'value'),
+        State('savings_firm_input', 'value'),
         State('omegah_input', 'value'),
         State('omegaf_input', 'value'),
         State('volatility_input', 'value'),
@@ -66,8 +66,8 @@ def register_callbacks(app) -> None:
             omegaf_slider: Optional[float],
             screen: str,
             econ_data: Optional[str],
-            savings_households: float,
-            savings_firms: float,
+            savings_household: float,
+            savings_firm: float,
             omegah_input: float,
             omegaf_input: float,
             volatility_input: float,
@@ -88,8 +88,8 @@ def register_callbacks(app) -> None:
             omegaf_slider (Optional[float]): The current value of the omegaf slider.
             screen (str): The current screen being displayed ('setup' or 'sim').
             econ_data (Optional[str]): A JSON-serialized string of the simulation's history.
-            savings_households (float): The value from the household savings input.
-            savings_firms (float): The value from the firm savings input.
+            savings_household (float): The value from the household savings input.
+            savings_firm (float): The value from the firm savings input.
             omegah_input (float): The value from the initial omegah input field.
             omegaf_input (float): The value from the initial omegaf input field.
             volatility_input (float): The value from the volatility input field.
@@ -117,8 +117,8 @@ def register_callbacks(app) -> None:
             inputs = [
                 omegah_input,
                 omegaf_input,
-                savings_households,
-                savings_firms,
+                savings_household,
+                savings_firm,
                 volatility_input,
                 memory_input
             ]
@@ -131,7 +131,7 @@ def register_callbacks(app) -> None:
                 volatility_input,
                 memory_input,
                 [omegah_input, omegaf_input],
-                [savings_households, savings_firms],
+                [savings_household, savings_firm],
             )
 
             # Serialize and store the initial simulation history
@@ -159,7 +159,7 @@ def register_callbacks(app) -> None:
                 volatility_input,
                 memory_input,
                 [last_state["omegah"], last_state["omegaf"]],
-                [last_state["savings_households"], last_state["savings_firms"]],
+                [last_state["savings_household"], last_state["savings_firm"]],
                 last_state.get("consumption", 0),
                 last_state.get("wages", 0),
             )
@@ -188,11 +188,11 @@ def register_callbacks(app) -> None:
 
             # === Heatmap Figure ===
             matrix = econ.get_matrix()
-            labels = np.array([['savings_households', 'consumption'], ['wages', 'savings_firms']])
+            labels = np.array([['savings_household', 'consumption'], ['wages', 'savings_firm']])
             fig_heatmap = go.Figure(data=go.Heatmap(
                 z=matrix,
-                x=['households', 'firms'],
-                y=['households', 'firms'],
+                x=['household', 'firm'],
+                y=['household', 'firm'],
                 colorscale=[[0.0, "#fff59d"], [0.25, "#FAF9F6"], [1.0, "#cba6f7"]],
                 text=labels,
                 texttemplate="%{text}<br>(%{z:.2%})",
