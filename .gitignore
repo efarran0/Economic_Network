@@ -14,6 +14,8 @@ __pycache__/
 config.local.*
 secrets.*
 pdf/images/*.py
+pdf/links file.pdf
+pdf/presentation.pdf
 
 # Temporary or large data files
 *.csv
@@ -24,6 +26,7 @@ pdf/images/*.py
 *.db
 *.pkl
 *.npz
+*.mp4
 data/
 outputs/
 results/

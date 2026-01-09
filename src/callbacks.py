@@ -210,9 +210,9 @@ def register_callbacks(app) -> None:
             )
 
             # Time series plot (left subplot)
-            fig_combined.add_trace(go.Scatter(x=t_vals, y=omegah_vals, name='α', mode='lines', hoverinfo='none', showlegend=False),
+            fig_combined.add_trace(go.Scatter(x=t_vals, y=omegah_vals, name='Ωʰ', mode='lines', hoverinfo='none', showlegend=False),
                                    row=1, col=1)
-            fig_combined.add_trace(go.Scatter(x=t_vals, y=omegaf_vals, name='ρ', mode='lines', hoverinfo='none', showlegend=False),
+            fig_combined.add_trace(go.Scatter(x=t_vals, y=omegaf_vals, name='Ωᶠ', mode='lines', hoverinfo='none', showlegend=False),
                                    row=1, col=1)
             fig_combined.update_xaxes(
                 title_text='Time (t)',
@@ -235,16 +235,16 @@ def register_callbacks(app) -> None:
             # Latest value plot (right subplot)
             fig_combined.add_trace(
                 go.Scatter(x=[1] * len(omegah_vals), y=omegah_vals, mode='markers',
-                           marker=dict(color='blue', size=5), name='α', hoverinfo='none', showlegend=False),
+                           marker=dict(color='blue', size=5), name='Ωʰ', hoverinfo='none', showlegend=False),
                 row=1, col=2
             )
             fig_combined.add_trace(
                 go.Scatter(x=[1.8] * len(omegaf_vals), y=omegaf_vals, mode='markers',
-                           marker=dict(color='red', size=5), name='ρ', hoverinfo='none', showlegend=False),
+                           marker=dict(color='red', size=5), name='Ωᶠ', hoverinfo='none', showlegend=False),
                 row=1, col=2
             )
             fig_combined.update_xaxes(
-                range=[0.5, 2.5], tickvals=[1, 1.8], ticktext=['α', 'ρ'],
+                range=[0.5, 2.5], tickvals=[1, 1.8], ticktext=['Ωʰ', 'Ωᶠ'],
                 showgrid=False, zeroline=False, showticklabels=True, row=1, col=2
             )
             fig_combined.update_yaxes(

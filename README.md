@@ -3,18 +3,20 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-rebeccapurple.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 
-This project provides a simulation framework for modeling and visualizing the evolution of a closed economic network. It is based on agent micro-interactions and was developed as part of the Data Science Master's program at [Universitat Oberta de Catalunya](https://www.uoc.edu/es).
+This project provides an interactive simulation and visual analytics dashboard for exploring the evolution of a closed economic network. Based on agent micro-interactions and behavioral inference, it allows users to explore hypothetical economic scenarios, policy interventions, and shock propagation.
+
+The project is developed as part of the Data Science Master's program at [Universitat Oberta de Catalunya](https://www.uoc.edu/es) and corresponds to a Master's Thesis submission on **January 09, 2026**.
 
 ---
 
 ### Description
 
-This web application simulates a closed economy with two agents: a **household** and a **firm**. Their behavioral rules are derived from the theoretical model detailed in *Annex A* of the associated [master's thesis](https://github.com/efarran0/Economic_Network/blob/main/pdf/memory.pdf), which outlines the core principles of agent interaction.
+This web application simulates a closed economy with two agents: a **household** and a **firm**. Their behavioral rules are derived from the theoretical model detailed in *Annex A* of the associated [Master's thesis](https://github.com/efarran0/Economic_Network/blob/main/pdf/memory.pdf), which outlines the core principles of agent interaction.
 
 The application is divided into two main screens:
 
-* **Setting Screen**: Define initial economic conditions, such as savings, propensities, and stability settings. Launch the simulation via the **Start Simulation** button.
-* **Dashboard Screen**: Visualize real-time interactions, including a **heatmap** of inter-agent monetary flows, **interactive sliders** for adjusting parameters, and **time series plots** showing the historical evolution of propensities.
+* **Setting Screen**. Define initial economic conditions, such as savings, propensities, and stability settings. Launch the simulation via the **Start Simulation** button.
+* **Dashboard Screen**. Visualize real-time interactions, including a **heatmap** of inter-agent monetary flows, **interactive sliders** for adjusting parameters, and **time series plots** showing the historical evolution of propensities.
 
 ---
 
@@ -22,13 +24,13 @@ The application is divided into two main screens:
 
 The project is built using a modern Python stack:
 
-* **Python 3**: The core programming language.
-* **NumPy**: For numerical operations.
-* **Pandas**: For efficient data manipulation and analysis.
-* **Statsmodels**: For statistical modeling and time series analysis.
-* **Dash (Plotly)**: For interactive web applications and visualizations.
-* **Gunicorn**: For deploying the application.
-* **Render**: For continuous deployment.
+* **Python 3**. The core programming language.
+* **NumPy**. For numerical operations.
+* **Pandas**. For efficient data manipulation and analysis.
+* **Statsmodels**. For statistical modeling and time series analysis.
+* **Dash (Plotly)**. For interactive web applications and visualizations.
+* **Gunicorn**. For deploying the application.
+* **Render**. For continuous deployment.
 
 ---
 
@@ -36,9 +38,9 @@ The project is built using a modern Python stack:
 
 AI tools were employed as a collaborative partner to support key aspects of the project's development:
 
-* **Code Generation**: For initial code snippets and boilerplate.
-* **Performance Optimization**: To identify and improve bottlenecks.
-* **Refactoring and Restructuring Assistance**: To improve readability, maintainability, and adherence to modern Python best practices.
+* **Code Generation**. For initial code snippets and boilerplate.
+* **Performance Optimization**. To identify and improve bottlenecks.
+* **Refactoring and Restructuring Assistance**. To improve readability, maintainability, and adherence to modern Python best practices.
 
 ---
 
@@ -93,14 +95,15 @@ The **academic content**, located in `/pdf`, including all text, figures, and re
 
 ## Citing
 
-If you use this work in your research, please cite the associated master's thesis:
+To cite this work, use the following BibTeX reference:
 
 ```bibtex
-@mastersthesis{FarranMoreno2025,
-  author = {Eric Farran Moreno},
-  title = {Economic Network Modeling: A Graph-Theoretical Framework Linking Micro-interactions to Macro-dynamics},
-  school = {Universitat Oberta de Catalunya},
-  year = {2025},
-  url = {https://github.com/efarran0/Economic_Network/blob/main/pdf/memory.pdf}
+@thesis{FarranMoreno2026,
+  author       = {Farran Moreno, Eric},
+  title        = {Economic Network Modeling: A Graph-Theoretical Framework Linking Micro-interactions to Macro-dynamics},
+  institution  = {Universitat Oberta de Catalunya},
+  year         = {2026},
+  type         = {Master's Thesis},
+  url          = {https://github.com/efarran0/Economic_Network/blob/main/pdf/memory.pdf}
 }
 ```
