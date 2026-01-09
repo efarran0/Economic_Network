@@ -67,8 +67,8 @@ AI tools were employed as a collaborative partner to support key aspects of the 
 
     On Windows:
     ```bash
-    .venv\Scripts\python.exe -m pip install -r requirements.txt
-    .venv\Scripts\python.exe -m src.app
+    .venv\scripts\python.exe -m pip install -r requirements.txt
+    .venv\scripts\python.exe -m src.app
     ```
     
     On Linux/macOS:
