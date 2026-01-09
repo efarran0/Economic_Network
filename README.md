@@ -15,9 +15,11 @@ This web application simulates a closed economy with two agents: a **household**
 
 The application is divided into two main screens:
 
-* **Setting Screen**. Define initial economic conditions, such as savings, propensities, and stability settings. Launch the simulation via the **Start Simulation** button.
-* **Dashboard Screen**. Visualize real-time interactions, including a **heatmap** of inter-agent monetary flows, **interactive sliders** for adjusting parameters, and **time series plots** showing the historical evolution of propensities.
-
+* **Setting screen**. Define initial economic conditions, such as savings, propensities, and stability settings. Launch the simulation via the **Start Simulation** button.
+* **Dashboard screen**. Visualize real-time interactions, including:
+  * **Heatmap** of inter-agent monetary flows
+  * **Interactive sliders** for adjusting parameters
+  * **Time series plots** showing the historical evolution of propensities
 ---
 
 ### Technology
@@ -38,48 +40,42 @@ The project is built using a modern Python stack:
 
 AI tools were employed as a collaborative partner to support key aspects of the project's development:
 
-* **Code Generation**. For initial code snippets and boilerplate.
-* **Performance Optimization**. To identify and improve bottlenecks.
-* **Refactoring and Restructuring Assistance**. To improve readability, maintainability, and adherence to modern Python best practices.
+* **Code generation**. For initial code snippets and boilerplate.
+* **Performance optimization**. To identify and improve bottlenecks.
+* **Refactoring and restructuring assistance**. To improve readability, maintainability, and adherence to modern Python best practices.
 
 ---
 
 ### Cloning and Execution
 
-To get a local copy of the project up and running, follow these steps in your terminal:
+* **Quick start:**
 
-**1. Clone the repository**
-```bash
-git clone https://github.com/efarran0/Economic_Network.git
-cd Economic_Network
-```
+    Open the [web application](https://economic-network.onrender.com)
 
-**2. Create and activate a virtual environment (optional)**
-```bash
-python -m venv .venv
-```
+* **Local development:**
+  * **0. Prerequisites**
+    * Python 3.8 or higher.
 
-On Windows:
-```bash
-./.venv/Scripts/activate
-```
+  * **1. Clone**
+    ```bash
+    git clone https://github.com/efarran0/Economic_Network.git
+    cd Economic_Network
+    python -m venv .venv
+    ```
 
-On Linux/macOS:
-```bash
-source ./.venv/bin/activate
-```
+  * **2. Install dependencies and run**
 
-**3. Install required dependencies from the requirements file**
-```bash
-pip install -r requirements.txt
-```
-
-**4. Execute the application script to launch the visualization**
-```bash
-python -m src.app
-```
-
-Or, alternatively, you can explore the simulation directly through the [Render web application](https://economic-network.onrender.com).
+    On Windows:
+    ```bash
+    .venv\Scripts\python.exe -m pip install -r requirements.txt
+    .venv\Scripts\python.exe -m src.app
+    ```
+    
+    On Linux/macOS:
+    ```bash
+    ./.venv/bin/python -m pip install -r requirements.txt
+    ./.venv/bin/python -m src.app
+    ```
 
 ---
 
