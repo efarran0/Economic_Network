@@ -36,7 +36,7 @@ The project is built using a modern Python stack:
 
 ---
 
-### Artificial Intelligence Usage
+### Acknowledgment of Artificial Intelligence Use
 
 AI tools were employed as a collaborative partner to support key aspects of the project's development:
 
@@ -86,20 +86,3 @@ This project uses a dual-licensing model to ensure proper use and sharing of bot
 The **source code**, located in `/src` and related folders, is licensed under the [**MIT License**](https://github.com/efarran0/Economic_Network/blob/main/LICENSE#L5).
 
 The **academic content**, located in `/pdf`, including all text, figures, and research material, is licensed under the [**CC BY-SA 4.0 License**](https://github.com/efarran0/Economic_Network/blob/main/LICENSE#L30).
-
----
-
-## Citing
-
-To cite this work, use the following BibTeX reference:
-
-```bibtex
-@thesis{FarranMoreno2026,
-  author       = {Farran Moreno, Eric},
-  title        = {Economic Network Modeling: A Graph-Theoretical Framework Linking Micro-interactions to Macro-dynamics},
-  institution  = {Universitat Oberta de Catalunya},
-  year         = {2026},
-  type         = {Master's Thesis},
-  url          = {https://github.com/efarran0/Economic_Network/blob/main/pdf/memory.pdf}
-}
-```
